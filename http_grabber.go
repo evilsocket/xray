@@ -101,12 +101,7 @@ func Subject2String( s pkix.Name ) string {
 func collectCertificates( certs []*x509.Certificate, t *Target ) {
 	if certs != nil && len(certs) > 0 {
 		for i, cert := range certs {
-			subj := Subject2String( cert.Subject )
-			if cert.IsCA {
-				subj = "(CA) " + subj;
-			}
-		
-			t.Banners[ fmt.Sprintf("https:chain[%d]",i) ] = subj
+			t.Banners[ fmt.Sprintf("https:chain[%d]",i) ] = Subject2String( cert.Subject )
 		}
 	}
 }
