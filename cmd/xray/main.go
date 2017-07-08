@@ -91,7 +91,7 @@ var (
 
 	base       = flag.String("domain", "", "Base domain to start enumeration from.")
 	wordlist   = flag.String("wordlist", "wordlists/default.lst", "Wordlist file to use for enumeration.")
-	consumers  = flag.Int("consumers", 16, "Number of concurrent consumers.")
+	consumers  = flag.Int("consumers", 16, "Number of concurrent consumers to use for subdomain enumeration.")
 	shodan_tok = flag.String("shodan-key", "", "Shodan API key.")
 	address    = flag.String("address", "127.0.0.1", "IP address to bind the web ui server to.")
 	session    = flag.String("session", "<domain-name>-session.json", "Session file name.")
