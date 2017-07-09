@@ -4,6 +4,15 @@ XRay is a tool for network OSINT gathering, its goal is to make some of the init
 
 ![xray](https://pbs.twimg.com/media/DEOZt1bWsAEOsMX.jpg)
 
+## How Does it Work?
+
+XRay is a very simple tool, it works this way:
+
+1. It'll bruteforce subdomains using a wordlist and DNS requests.
+2. For every subdomain/ip found, it'll use Shodan to gather open ports and other intel.
+3. For every unique ip address, and for every open port, it'll launch specific banner grabbers and info collectors.
+4. Eventually the data is presented to the user on the web ui.
+
 ## Notes
 
 **Shodan API Key**
