@@ -35,7 +35,6 @@ import (
 	"time"
 
 	"github.com/bobesa/go-domain-util/domainutil"
-	"github.com/evilsocket/brutemachine"
 	"github.com/evilsocket/xray"
 	"github.com/gin-gonic/contrib/static"
 	"github.com/gin-gonic/gin"
@@ -74,19 +73,20 @@ func OnResult(res interface{}) {
 		t := pool.Find(address)
 		if t == nil {
 			pool.Add(xray.NewTarget(address, result.hostname, shapi))
-			pool.Flush()
+			pool.FlushSession(&bruter.Stats)
 		} else {
 			if t.AddDomain(result.hostname) == true {
-				pool.Flush()
+				pool.FlushSession(&bruter.Stats)
 			}
 		}
 	}
 }
 
 var (
+	session *xray.Session
 	pool   *xray.Pool
 	shapi  *shodan.Client
-	bruter *brutemachine.Machine
+	bruter *xray.Machine
 	router *gin.Engine
 
 	base       = flag.String("domain", "", "Base domain to start enumeration from.")
@@ -94,7 +94,7 @@ var (
 	consumers  = flag.Int("consumers", 16, "Number of concurrent consumers to use for subdomain enumeration.")
 	shodan_tok = flag.String("shodan-key", "", "Shodan API key.")
 	address    = flag.String("address", "127.0.0.1", "IP address to bind the web ui server to.")
-	session    = flag.String("session", "<domain-name>-session.json", "Session file name.")
+	sesfile    = flag.String("session", "<domain-name>-session.json", "Session file name.")
 	port       = flag.Int("port", 8080, "TCP port to bind the web ui server to.")
 )
 
@@ -117,15 +117,16 @@ func main() {
 		fmt.Printf("! WARNING: No Shodan API token provided, XRAY won't be able to get per-ip information.\n")
 	} 
 	
-	if *session == "<domain-name>-session.json" || *session == "" {
-		*session = fmt.Sprintf( "%s-session.json", *base )
+	if *sesfile == "<domain-name>-session.json" || *sesfile == "" {
+		*sesfile = fmt.Sprintf( "%s-session.json", *base )
 	}
 
 	gin.SetMode(gin.ReleaseMode)
 
-	pool = xray.NewPool(*session)
+	session = xray.NewSession(*sesfile)
+	pool = xray.NewPool(session)
 	shapi = shodan.NewClient(nil, *shodan_tok)
-	bruter = brutemachine.New(*consumers, *wordlist, DoRequest, OnResult)
+	bruter = xray.NewMachine(*consumers, *wordlist, session, DoRequest, OnResult)
 	router = gin.New()
 
 	// Easy stuff, serve static assets and JSON "API"
@@ -135,13 +136,16 @@ func main() {
 		c.JSON(200, gin.H{
 			"domain":  *base,
 			"stats":   bruter.Stats,
-			"targets": pool.Targets,
+			"targets": session.Targets,
 		})
 	})
 
 	// Let the user know where the session file is located.
-	if !pool.WasRestored {
-		fmt.Printf( "@ Saving session to %s\n", *session )
+	if !pool.WasRestored() {
+		fmt.Printf( "@ Saving session to %s\n", *sesfile )
+	} else {
+		progress := (float64(session.Stats.Execs) / float64(session.Stats.Inputs)) * 100.0
+		fmt.Printf( "@ Restoring DNS bruteforcing from %.2f%%\n", progress )
 	}
 
 	// Start web server in its own go routine.
@@ -158,7 +162,7 @@ func main() {
 		for _ = range ticker.C {
 			progress := (float64(bruter.Stats.Execs) / float64(bruter.Stats.Inputs)) * 100.0
 			if progress < 100.0 {
-				fmt.Printf("%.2f %% completed, %.2f req/s, %d unique targets found so far ...\n", progress, bruter.Stats.Eps, len(pool.Targets))
+				fmt.Printf("%.2f %% completed, %.2f req/s, %d unique targets found so far ...\n", progress, bruter.Stats.Eps, len(session.Targets))
 			}
 		}
 	}()

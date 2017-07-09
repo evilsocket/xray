@@ -1,5 +1,5 @@
 hash: ea28ba13cd0d733cabb52755d42b0e3219337e98dee552c0758e441f8e08ccd2
-updated: 2017-07-09T00:01:59.153290094+02:00
+updated: 2017-07-09T12:31:04.714797116+02:00
 imports:
 - name: github.com/bobesa/go-domain-util
   version: b0f58b2366836c2600dac855dc832a774fc19b6e
@@ -18,7 +18,7 @@ imports:
   subpackages:
   - static
 - name: github.com/gin-gonic/gin
-  version: e8187ddf14935fd99cbceaab83338448f443b8d2
+  version: df3b79e805233f553c0495cfa1fb76766b9d80b3
   subpackages:
   - binding
   - render
@@ -31,11 +31,11 @@ imports:
   subpackages:
   - query
 - name: github.com/json-iterator/go
-  version: 37ba1b32b5ed52dfaff0fe50d923d210c11c8daf
+  version: d336ee6da6782079e23b6e84e4f3c9a36e31fe06
 - name: github.com/mattn/go-isatty
   version: 57fdcb988a5c543893cc61bce354a6e24ab70022
 - name: github.com/miekg/dns
-  version: e46719b2fef404d2e531c0dd9055b1c95ff01e2e
+  version: 0559e6d230af0a3a7273853cb6994ebea21bfbe5
 - name: github.com/ns3777k/go-shodan
   version: ff5ba7374441daa8cc939a9dfcd07bcf6e680edb
   subpackages:

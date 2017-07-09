@@ -49,10 +49,6 @@ Example:
 
     xray -shodan-key yadayadayadapicaboo... -domain fbi.gov
 
-## TODO
-
-Session support is not complete: once session is restored, DNS bruteforcing should start from last line.
-
 ## License
 
 This project is copyleft of [Simone Margaritelli](https://www.evilsocket.net/) and released under the GPL 3 license.
