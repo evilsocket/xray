@@ -156,10 +156,12 @@ func main() {
 		}
 	}()
 
-	// Print progress every 10s.
+	// Save session and print progress every 10s.
 	go func() {
 		ticker := time.NewTicker(time.Millisecond * 10000)
 		for _ = range ticker.C {
+			pool.FlushSession(&bruter.Stats)
+
 			progress := (float64(bruter.Stats.Execs) / float64(bruter.Stats.Inputs)) * 100.0
 			if progress < 100.0 {
 				fmt.Printf("%.2f %% completed, %.2f req/s, %d unique targets found so far ...\n", progress, bruter.Stats.Eps, len(session.Targets))
