@@ -144,8 +144,7 @@ func main() {
 	if !pool.WasRestored() {
 		fmt.Printf( "@ Saving session to %s\n", *sesfile )
 	} else {
-		progress := (float64(session.Stats.Execs) / float64(session.Stats.Inputs)) * 100.0
-		fmt.Printf( "@ Restoring DNS bruteforcing from %.2f%%\n", progress )
+		fmt.Printf( "@ Restoring DNS bruteforcing from %.2f%%\n", session.Stats.Progress )
 	}
 
 	// Start web server in its own go routine.
@@ -160,11 +159,11 @@ func main() {
 	go func() {
 		ticker := time.NewTicker(time.Millisecond * 10000)
 		for _ = range ticker.C {
+			bruter.UpdateStats()
 			pool.FlushSession(&bruter.Stats)
 
-			progress := (float64(bruter.Stats.Execs) / float64(bruter.Stats.Inputs)) * 100.0
-			if progress < 100.0 {
-				fmt.Printf("%.2f %% completed, %.2f req/s, %d unique targets found so far ...\n", progress, bruter.Stats.Eps, len(session.Targets))
+			if bruter.Stats.Progress < 100.0 {
+				fmt.Printf("%.2f %% completed, %.2f req/s, %d unique targets found so far ...\n", bruter.Stats.Progress, bruter.Stats.Eps, len(session.Targets))
 			}
 		}
 	}()

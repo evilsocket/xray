@@ -53,11 +53,11 @@ app.controller('XRayController', ['$scope', function (scope) {
             dur.setSeconds( (stop-start) / 1000 );
 
             scope.duration = dur.toISOString().substr(11, 8);;
+            scope.ntargets = Object.keys(scope.targets).length;
+
             scope.domain = data.domain;
             scope.stats = data.stats;
-            scope.stats.Progress = ( ( scope.stats.Execs / scope.stats.Inputs ) * 100.0 ).toFixed(2);
             scope.targets = data.targets;
-            scope.ntargets = Object.keys(scope.targets).length;
             document.title = "XRAY ( " + scope.domain + " | " + scope.stats.Progress + "% )";
             scope.$apply();
         });

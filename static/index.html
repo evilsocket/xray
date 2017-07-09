@@ -48,7 +48,7 @@
           <th>Progress</th>
           <td style="line-height: 0.8;">
               <div class="progress-bar" role="progressbar" aria-valuenow="{{ stats.Progress | number:0 }}" aria-valuemin="0" aria-valuemax="100" style="width: {{ stats.Progress }}%;">
-                {{ stats.Progress }}%
+                {{ stats.Progress | number:2 }}%
               </div>
           </td>
         </tr>

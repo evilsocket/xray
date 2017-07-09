@@ -49,6 +49,8 @@ type Statistics struct {
 	Execs   uint64
 	// Total number of executions with positive results.
 	Results uint64
+	// % of progress as: ( execs / inputs ) * 100.0
+	Progress float64
 }
 
 // This is where the main logic goes.
@@ -173,6 +175,7 @@ func (m *Machine) UpdateStats() {
 	m.Stats.Stop = time.Now()
 	m.Stats.Total = m.Stats.Stop.Sub(m.Stats.Start)
 	m.Stats.Eps = float64(m.Stats.Execs) / m.Stats.Total.Seconds()
+	m.Stats.Progress = (float64(m.Stats.Execs) / float64(m.Stats.Inputs)) * 100.0
 }
 
 // Wait for all jobs to be completed.
