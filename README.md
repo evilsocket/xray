@@ -51,7 +51,7 @@ You'll find the executable in the `build` folder.
       -address string
             IP address to bind the web ui server to. (default "127.0.0.1")
       -consumers int
-            Number of concurrent consumers. (default 16)
+            Number of concurrent consumers to use for subdomain enumeration. (default 16)
       -domain string
             Base domain to start enumeration from.
       -port int
