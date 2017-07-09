@@ -1,6 +1,6 @@
 .DS_Store
 *-session.json
-cmd/xray/static.go
+cmd/xray/ui.go
 *.sw*
 vendor/
 build/

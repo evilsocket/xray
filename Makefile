@@ -22,12 +22,12 @@ test:
 # Removing artifacts
 .PHONY: clean
 clean:
-	@rm -rf $(NAME) static.go
+	@rm -rf $(NAME) ui.go
 	@rm -rf build
 
 .PHONY: static
 static:
-	go-bindata -o cmd/xray/static.go -pkg main static
+	go-bindata -o cmd/xray/ui.go -pkg main ui
 
 # Building linux binaries
 .PHONY: build

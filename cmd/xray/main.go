@@ -130,7 +130,7 @@ func main() {
 	router = gin.New()
 
 	// Easy stuff, serve static assets and JSON "API"
-	router.Use(static.Serve("/", NewBFS("static")))
+	router.Use(static.Serve("/", NewBFS("ui")))
 	router.GET("/targets", func(c *gin.Context) {
 		bruter.UpdateStats()
 		c.JSON(200, gin.H{
