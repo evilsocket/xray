@@ -65,7 +65,18 @@ You'll find the executable in the `build` folder.
 
 Example:
 
-    xray -shodan-key yadayadayadapicaboo... -domain fbi.gov
+    # xray -shodan-key yadayadayadapicaboo... -domain fbi.gov
+
+    ____  ___
+    \   \/  /
+     \     RAY v 1.0.0b
+     /    by Simone 'evilsocket' Margaritelli
+    /___/\  \
+          \_/
+    
+    @ Saving session to fbi.gov-session.json
+    @ Web UI running on http://127.0.0.1:8080/
+
 
 ## License
 
