@@ -36,7 +36,7 @@ If I were you, I'd find a way to proxify the whole process ... #justsaying
 
 ## Installation
 
-Make sure you are using Go >= 1.7, that your installation is working properly, that you have set the `$GOPATH` variable and you have appended `$GOPATH/bin` to your `$PATH`.
+Make sure you are using **Go >= 1.7**, that your installation is working properly, that you have set the `$GOPATH` variable and you have appended `$GOPATH/bin` to your `$PATH`.
 
 Then:
 
