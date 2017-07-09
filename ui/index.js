@@ -57,13 +57,30 @@ app.controller('XRayController', ['$scope', function (scope) {
 
             if( $('#hide_empty').is(':checked') == true ) {
                 var filtered = {};
-
                 for( var ip in data.targets ) {
                     var t = data.targets[ip];
                     if( t.Info != null && t.Info.ports.length > 0 ) {
                         filtered[ip] = t;
                     }
                 }
+
+                data.targets = filtered;
+            }
+
+            var search = $('#search').val();
+            if( search != "" ) {
+                search = search.toLowerCase();
+
+                var filtered = {};
+                for( var ip in data.targets ) {
+                    var t = data.targets[ip];
+                    var txt = JSON.stringify(t).toLowerCase();
+                    if( txt.search(search) >= 0 ) {
+                        filtered[ip] = t;
+                    }
+                }
+
+                console.log(filtered);
 
                 data.targets = filtered;
             }
