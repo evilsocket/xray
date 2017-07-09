@@ -12,7 +12,7 @@ The [shodan.io](https://www.shodan.io/) API key parameter ( `-shodan-key KEY` ) 
 
 **Anonymity and Legal Issues**
 
-The software will rely on your main DNS resolver in order to enumerate subdomains, also, several TCP connections might be directly established from your host to the computers of the network you're scanning in order to grab banners from open ports. Technically, you're just connecting to public addresses with open ports (and **there's no port scanning involved**, as such information is grabbed indirectly using Shodan API), but you know, someone might not like such behaviour.
+The software will rely on your main DNS resolver in order to enumerate subdomains, also, several connections might be directly established from your host to the computers of the network you're scanning in order to grab banners from open ports. Technically, you're just connecting to public addresses with open ports (and **there's no port scanning involved**, as such information is grabbed indirectly using Shodan API), but you know, someone might not like such behaviour.
 
 If I were you, I'd find a way to proxify the whole process ... #justsaying
 
