@@ -13,6 +13,15 @@ XRay is a very simple tool, it works this way:
 3. For every unique ip address, and for every open port, it'll launch specific banner grabbers and info collectors.
 4. Eventually the data is presented to the user on the web ui.
 
+**Grabbers and Collectors**
+
+* **HTTP** `Server`, `X-PoweredBy` and `Location` headers.
+* **HTTP** `robots.txt` disallowed entries.
+* **HTTPS** certificates chain.
+* **HTML** `title` tag.
+* **DNS** `version.bind.` and `hostname.bind.` records.
+* **MySQL**, **SMTP**, **FTP**, **SSH**, **POP** and **IRC** banners.
+
 ## Notes
 
 **Shodan API Key**
