@@ -46,7 +46,7 @@ app.controller('XRayController', ['$scope', function (scope) {
 
     scope.update = function() {
         $.get('/targets', function(data) {
-            if( scope.stats.Progress < 100.0 || scope.Stats.Progress == 0.0 ) {
+            if( scope.stats.Progress < 100.0 || scope.stats.Progress == 0.0 ) {
                 var start = new Date(data.stats.Start),
                     stop = new Date(data.stats.Stop),
                     dur = new Date(null);
