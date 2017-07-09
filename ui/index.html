@@ -32,7 +32,7 @@
           <th width="5%">Domain</th>
           <td>{{ domain }}</td>
         </tr>
-        <tr>
+        <tr ng-hide="stats.Progress >= 100.0">
           <th>Speed</th>
           <td>{{ stats.Eps | number:1 }} req/s</td>
         </tr>
@@ -44,7 +44,7 @@
           <th>Duration</th>
           <td>{{ duration }}</td>
         </tr>
-        <tr>
+        <tr ng-hide="stats.Progress >= 100.0">
           <th>Progress</th>
           <td style="line-height: 0.8;">
               <div class="progress-bar" role="progressbar" aria-valuenow="{{ stats.Progress | number:0 }}" aria-valuemin="0" aria-valuemax="100" style="width: {{ stats.Progress }}%;">
