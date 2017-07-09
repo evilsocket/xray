@@ -36,6 +36,8 @@ If I were you, I'd find a way to proxify the whole process ... #justsaying
 
 ## Installation
 
+    Make sure your Go installation is working properly, that you have set the `$GOPATH` variable and you have appended `$GOPATH/bin` to your `$PATH`.
+
     go get github.com/evilsocket/xray
     cd $GOPATH/src/github.com/evilsocket/xray/
     make get_glide
