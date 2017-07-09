@@ -55,6 +55,19 @@ app.controller('XRayController', ['$scope', function (scope) {
                 scope.duration = dur.toISOString().substr(11, 8);;
             }
 
+            if( $('#hide_empty').is(':checked') == true ) {
+                var filtered = {};
+
+                for( var ip in data.targets ) {
+                    var t = data.targets[ip];
+                    if( t.Info != null && t.Info.ports.length > 0 ) {
+                        filtered[ip] = t;
+                    }
+                }
+
+                data.targets = filtered;
+            }
+
             scope.targets = data.targets;
             scope.ntargets = Object.keys(scope.targets).length;
             scope.domain = data.domain;
