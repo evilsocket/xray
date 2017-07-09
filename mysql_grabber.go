@@ -27,48 +27,35 @@
 package xray
 
 import (
-	"bufio"
 	"fmt"
+	"regexp"
+	"bufio"
 	"net"
-	"strings"
 )
 
-type Grabber interface {
-	Name() string
-	Grab(port int, t *Target)
+type MYSQLGrabber struct {
+
 }
 
-type LineGrabber struct {
-	name  string
-	ports []int
+func (g *MYSQLGrabber) Name() string {
+	return "mysql"
 }
 
-func NewLineGrabber(name string, ports []int) *LineGrabber {
-	return &LineGrabber{
-		name:  name,
-		ports: ports,
+func (g *MYSQLGrabber) Grab( port int, t *Target ) {
+	if port != 3306 {
+		return
 	}
-}
 
-func (g *LineGrabber) Name() string {
-	return g.name
-}
-
-func (g *LineGrabber) CheckPort(port int) bool {
-	for _, p := range g.ports {
-		if p == port {
-			return true
-		}
-	}
-	return false
-}
-
-func (g *LineGrabber) Grab(port int, t *Target) {
-	if g.CheckPort(port) {
-		if conn, err := net.Dial("tcp", fmt.Sprintf("%s:%d", t.Address, port)); err == nil {
-			defer conn.Close()
-			msg, _ := bufio.NewReader(conn).ReadString('\n')
-			t.Banners[ g.Name() ] = strings.Trim( msg, "\r\n\t " )
+	if conn, err := net.Dial("tcp", fmt.Sprintf("%s:%d", t.Address, port )); err == nil {
+		defer conn.Close()
+		buf := make([]byte,1024)
+		if read, err := bufio.NewReader(conn).Read(buf); err == nil && read > 0 {
+			s := string(buf[0:read])
+			re := regexp.MustCompile(".+\x0a([^\x00]+)\x00.+")
+			match := re.FindStringSubmatch(s)
+			if len(match) > 0 {
+				t.Banners[g.Name()] = match[1]
+			}
 		}
 	}
 }

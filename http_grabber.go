@@ -151,7 +151,7 @@ func collectRobots( client *http.Client, url string, t* Target ) {
 				}
 
 				if len(bann) > 0 {
-					t.Banners["robots:disallow"] = strings.Join( bann, ", " )
+					t.Banners["http:disallow"] = strings.Join( bann, ", " )
 				}
 			}
 		}

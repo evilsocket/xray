@@ -53,10 +53,12 @@ func NewTarget( address string, domain string, sh *shodan.Client ) *Target {
 
 	t.grabbers = append( t.grabbers, &HTTPGrabber{} )
 	t.grabbers = append( t.grabbers, &DNSGrabber{} )
+	t.grabbers = append( t.grabbers, &MYSQLGrabber{} )
 	t.grabbers = append( t.grabbers, NewLineGrabber( "smtp", []int{ 25, 587 } )  )
 	t.grabbers = append( t.grabbers, NewLineGrabber( "ftp", []int{ 21} )  )
 	t.grabbers = append( t.grabbers, NewLineGrabber( "ssh", []int{ 22, 222, 2222 } )  )
 	t.grabbers = append( t.grabbers, NewLineGrabber( "pop", []int{ 110 } )  )
+	t.grabbers = append( t.grabbers, NewLineGrabber( "irc", []int{ 6667 } )  )
 
 	t.startAsyncScan(sh)
 	return t
