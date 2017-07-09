@@ -74,8 +74,6 @@ type Machine struct {
 	run_handler RunHandler
 	// Positive results handler.
 	res_handler ResultHandler
-	// Line number to restore the execution from.
-	restore_from uint64
 }
 
 // Builds a new machine object, if consumers is less or equal than 0, CPU*2 will be used as default value.
@@ -87,13 +85,15 @@ func NewMachine( consumers int, filename string, session *Session, run_handler R
 		workers = uint(consumers)
 	}
 
-	restore := uint64(0)
+	var stats *Statistics
 	if session.Stats != nil && session.Stats.Execs > 0 {
-		restore = session.Stats.Execs
+		stats = session.Stats
+	} else {
+		stats = &Statistics{}
 	}
-
+	
 	return &Machine{
-		Stats:       Statistics{},
+		Stats:       *stats,
 		consumers:   workers,
 		filename:    filename,
 		output:      make(chan interface{}),
@@ -101,7 +101,6 @@ func NewMachine( consumers int, filename string, session *Session, run_handler R
 		wait:        sync.WaitGroup{},
 		run_handler: run_handler,
 		res_handler: res_handler,
-		restore_from: restore,
 	}
 }
 
@@ -134,9 +133,8 @@ func (m *Machine) Start() error {
 	// start the output consumer on a goroutine
 	go m.outputConsumer()
 
-	m.Stats.Start = time.Now()
-
 	// count the inputs we have
+	m.Stats.Inputs = 0
 	lines, err := LineReader(m.filename, 0)
 	if err != nil {
 		return err
@@ -150,15 +148,18 @@ func (m *Machine) Start() error {
 		return err
 	}
 
-	if m.restore_from > 0 {
-		m.Stats.Execs = m.restore_from
+	// If the stats have been loaded from a session file.
+	if m.Stats.Execs > 0 {
+		n := m.Stats.Execs
 		for _ = range lines {
-			m.restore_from--
-			if m.restore_from == 0{
+			n--
+			if n == 0{
 				break
 			}
 		}
-	}	
+	} else {
+		m.Stats.Start = time.Now()
+	}
 
 	for line := range lines {
 		m.wait.Add(1)
