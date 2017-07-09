@@ -46,19 +46,22 @@ app.controller('XRayController', ['$scope', function (scope) {
 
     scope.update = function() {
         $.get('/targets', function(data) {
-            var start = new Date(data.stats.Start),
-                stop = new Date(data.stats.Stop),
-                dur = new Date(null);
+            if( scope.stats.Progress < 100.0 || scope.Stats.Progress == 0.0 ) {
+                var start = new Date(data.stats.Start),
+                    stop = new Date(data.stats.Stop),
+                    dur = new Date(null);
 
-            dur.setSeconds( (stop-start) / 1000 );
+                dur.setSeconds( (stop-start) / 1000 );
+                scope.duration = dur.toISOString().substr(11, 8);;
+            }
 
-            scope.duration = dur.toISOString().substr(11, 8);;
+            scope.targets = data.targets;
             scope.ntargets = Object.keys(scope.targets).length;
-
             scope.domain = data.domain;
             scope.stats = data.stats;
-            scope.targets = data.targets;
+            
             document.title = "XRAY ( " + scope.domain + " | " + scope.stats.Progress + "% )";
+
             scope.$apply();
         });
     }
