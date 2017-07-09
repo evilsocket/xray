@@ -57,7 +57,7 @@ You'll find the executable in the `build` folder.
       -port int
             TCP port to bind the web ui server to. (default 8080)
       -session string
-            Session file name. (default "<domain-name>-session.json")
+            Session file name. (default "<domain-name>-xray-session.json")
       -shodan-key string
             Shodan API key.
       -wordlist string
@@ -73,8 +73,8 @@ Example:
      /    by Simone 'evilsocket' Margaritelli
     /___/\  \
           \_/
-    
-    @ Saving session to fbi.gov-session.json
+
+    @ Saving session to fbi.gov-xray-session.json
     @ Web UI running on http://127.0.0.1:8080/
 
 

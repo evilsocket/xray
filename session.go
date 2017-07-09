@@ -33,10 +33,16 @@ import (
 	"io/ioutil"
 )
 
+var SessionDefaultFilename = "<domain-name>-xray-session.json"
+
 type Session struct {
 	filename string 
 	Stats *Statistics
 	Targets map[string]*Target
+}
+
+func GetSessionFileName(domain string) {
+	return fmt.Sprintf( "%s-xray-session.json", domain )
 }
 
 func NewSession(filename string) *Session {

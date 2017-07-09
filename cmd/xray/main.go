@@ -94,7 +94,7 @@ var (
 	consumers  = flag.Int("consumers", 16, "Number of concurrent consumers to use for subdomain enumeration.")
 	shodan_tok = flag.String("shodan-key", "", "Shodan API key.")
 	address    = flag.String("address", "127.0.0.1", "IP address to bind the web ui server to.")
-	sesfile    = flag.String("session", "<domain-name>-session.json", "Session file name.")
+	sesfile    = flag.String("session", SessionDefaultFilename, "Session file name.")
 	port       = flag.Int("port", 8080, "TCP port to bind the web ui server to.")
 )
 
@@ -117,8 +117,8 @@ func main() {
 		fmt.Printf("! WARNING: No Shodan API token provided, XRAY won't be able to get per-ip information.\n")
 	} 
 	
-	if *sesfile == "<domain-name>-session.json" || *sesfile == "" {
-		*sesfile = fmt.Sprintf( "%s-session.json", *base )
+	if *sesfile == SessionDefaultFilename || *sesfile == "" {
+		*sesfile = GetSessionFileName(*base )
 	}
 
 	gin.SetMode(gin.ReleaseMode)
