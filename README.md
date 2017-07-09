@@ -42,6 +42,10 @@ If I were you, I'd find a way to proxify the whole process ... #justsaying
     make install_dependencies
     make build
 
+If you see errors regarding a missing `go-bindata` binary, try the following and make build again:
+
+    go get -u github.com/jteeuwen/go-bindata/...
+
 You'll find the executable in the `build` folder.
 
 ## Usage
