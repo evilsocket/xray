@@ -69,6 +69,6 @@ Example:
 
 ## License
 
-This project is copyleft of [Simone Margaritelli](https://www.evilsocket.net/) and released under the GPL 3 license.
+XRay was made with ♥  by [Simone Margaritelli](https://www.evilsocket.net/) and it's released under the GPL 3 license.
 
 The files in the `wordlists` folder have been taken from various open source tools accross several weeks and I don't remember all of them. If you find the wordlist of your project here and want to be mentioned, feel free to open an issue or send a pull request.
