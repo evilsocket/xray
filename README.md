@@ -15,7 +15,7 @@ XRay is a very simple tool, it works this way:
 
 **Grabbers and Collectors**
 
-* **HTTP** `Server`, `X-PoweredBy` and `Location` headers.
+* **HTTP** `Server`, `X-Powered-By` and `Location` headers.
 * **HTTP** and **HTTPS** `robots.txt` disallowed entries.
 * **HTTPS** certificates chain.
 * **HTML** `title` tag.
