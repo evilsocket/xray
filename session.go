@@ -41,7 +41,7 @@ type Session struct {
 	Targets map[string]*Target
 }
 
-func GetSessionFileName(domain string) {
+func GetSessionFileName(domain string) string {
 	return fmt.Sprintf( "%s-xray-session.json", domain )
 }
 
