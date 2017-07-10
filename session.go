@@ -27,39 +27,39 @@
 package xray
 
 import (
-	"os"
-	"fmt"
 	"encoding/json"
+	"fmt"
 	"io/ioutil"
+	"os"
 )
 
 var SessionDefaultFilename = "<domain-name>-xray-session.json"
 
 type Session struct {
-	filename string 
-	Stats *Statistics
-	Targets map[string]*Target
+	filename string
+	Stats    *Statistics
+	Targets  map[string]*Target
 }
 
 func GetSessionFileName(domain string) string {
-	return fmt.Sprintf( "%s-xray-session.json", domain )
+	return fmt.Sprintf("%s-xray-session.json", domain)
 }
 
 func NewSession(filename string) *Session {
 	s := &Session{
 		filename: filename,
-		Stats: nil,
-		Targets: make(map[string]*Target),
+		Stats:    nil,
+		Targets:  make(map[string]*Target),
 	}
 
 	if _, err := os.Stat(s.filename); !os.IsNotExist(err) {
-		fmt.Printf( "@ Restoring session from %s ...\n", s.filename )
+		fmt.Printf("@ Restoring session from %s ...\n", s.filename)
 		if data, e := ioutil.ReadFile(s.filename); e == nil {
-			if e = json.Unmarshal( data, &s ); e != nil {
+			if e = json.Unmarshal(data, &s); e != nil {
 				panic(e)
 			}
 
-			fmt.Printf( "@ Loaded %d entries from session file.\n", len(s.Targets) )
+			fmt.Printf("@ Loaded %d entries from session file.\n", len(s.Targets))
 		} else {
 			panic(e)
 		}
@@ -71,7 +71,7 @@ func NewSession(filename string) *Session {
 func (s *Session) Flush(stats *Statistics) {
 	s.Stats = stats
 	if data, err := json.Marshal(s); err == nil {
-		ioutil.WriteFile( s.filename, data, 0644 )
+		ioutil.WriteFile(s.filename, data, 0644)
 	} else {
 		panic(err)
 	}

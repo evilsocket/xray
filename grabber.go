@@ -68,7 +68,7 @@ func (g *LineGrabber) Grab(port int, t *Target) {
 		if conn, err := net.Dial("tcp", fmt.Sprintf("%s:%d", t.Address, port)); err == nil {
 			defer conn.Close()
 			msg, _ := bufio.NewReader(conn).ReadString('\n')
-			t.Banners[ g.Name() ] = strings.Trim( msg, "\r\n\t " )
+			t.Banners[g.Name()] = strings.Trim(msg, "\r\n\t ")
 		}
 	}
 }
