@@ -31,6 +31,8 @@ import (
 	"fmt"
 	"net"
 	"strings"
+
+	"github.com/evilsocket/xray/proxy"
 )
 
 type Grabber interface {
@@ -39,8 +41,9 @@ type Grabber interface {
 }
 
 type LineGrabber struct {
-	name  string
-	ports []int
+	name        string
+	ports       []int
+	proxyDialer proxy.Dialer
 }
 
 func NewLineGrabber(name string, ports []int) *LineGrabber {
@@ -65,9 +68,12 @@ func (g *LineGrabber) CheckPort(port int) bool {
 
 func (g *LineGrabber) Grab(port int, t *Target) {
 	if g.CheckPort(port) {
-		if conn, err := net.Dial("tcp", fmt.Sprintf("%s:%d", t.Address, port)); err == nil {
-			defer conn.Close()
-			msg, _ := bufio.NewReader(conn).ReadString('\n')
+		fmt.Println("Running")
+		address := fmt.Sprintf("%s:%d", t.Address, port)
+
+		if dialer, err := proxy.GetDialer(address); err == nil {
+			defer dialer.Close()
+			msg, _ := bufio.NewReader(dialer).ReadString('\n')
 			t.Banners[g.Name()] = strings.Trim(msg, "\r\n\t ")
 		}
 	}

@@ -30,12 +30,14 @@ import (
 	"flag"
 	"fmt"
 	"net"
+	"net/http"
 	"os"
 	"strings"
 	"time"
 
 	"github.com/bobesa/go-domain-util/domainutil"
 	"github.com/evilsocket/xray"
+	"github.com/evilsocket/xray/proxy"
 	"github.com/gin-gonic/contrib/static"
 	"github.com/gin-gonic/gin"
 	"github.com/ns3777k/go-shodan/shodan"
@@ -89,13 +91,14 @@ var (
 	bruter  *xray.Machine
 	router  *gin.Engine
 
-	base       = flag.String("domain", "", "Base domain to start enumeration from.")
-	wordlist   = flag.String("wordlist", "wordlists/default.lst", "Wordlist file to use for enumeration.")
-	consumers  = flag.Int("consumers", 16, "Number of concurrent consumers to use for subdomain enumeration.")
-	shodan_tok = flag.String("shodan-key", "", "Shodan API key.")
-	address    = flag.String("address", "127.0.0.1", "IP address to bind the web ui server to.")
-	sesfile    = flag.String("session", xray.SessionDefaultFilename, "Session file name.")
-	port       = flag.Int("port", 8080, "TCP port to bind the web ui server to.")
+	base         = flag.String("domain", "", "Base domain to start enumeration from.")
+	wordlist     = flag.String("wordlist", "wordlists/default.lst", "Wordlist file to use for enumeration.")
+	consumers    = flag.Int("consumers", 16, "Number of concurrent consumers to use for subdomain enumeration.")
+	shodan_tok   = flag.String("shodan-key", "", "Shodan API key.")
+	address      = flag.String("address", "127.0.0.1", "IP address to bind the web ui server to.")
+	sesfile      = flag.String("session", xray.SessionDefaultFilename, "Session file name.")
+	proxyAddress = flag.String("proxy", "", "SOCKS5 proxy to do banner grabbing")
+	port         = flag.Int("port", 8080, "TCP port to bind the web ui server to.")
 )
 
 func main() {
@@ -109,6 +112,7 @@ func main() {
 	fmt.Println("      \\_/")
 	fmt.Println("")
 
+	// Check for valid user inputs
 	if *base = domainutil.Domain(*base); *base == "" {
 		fmt.Println("Invalid or empty domain specified.")
 		flag.Usage()
@@ -121,23 +125,32 @@ func main() {
 		*sesfile = xray.GetSessionFileName(*base)
 	}
 
+	if err := proxy.ConfigureDialer(*proxyAddress); err != nil {
+		fmt.Println("Error: Could not configure dialer:", err)
+	}
+
 	gin.SetMode(gin.ReleaseMode)
+
+	// Create net/http.Client object to set timeout for Shodan
+	shodanHTTPConfig := http.Client{Timeout: 30 * time.Second}
 
 	session = xray.NewSession(*sesfile)
 	pool = xray.NewPool(session)
-	shapi = shodan.NewClient(nil, *shodan_tok)
+	shapi = shodan.NewClient(&shodanHTTPConfig, *shodan_tok)
 	bruter = xray.NewMachine(*consumers, *wordlist, session, DoRequest, OnResult)
 	router = gin.New()
 
-	// Test Shodan API
-	info, err := shapi.GetAPIInfo()
-	if *shodan_tok != "" && err != nil {
-		fmt.Println("Shodan Error:", err)
-		fmt.Println("Please fix error or remove `-shodan-key` flag")
-		os.Exit(1)
-	}
-	if *shodan_tok != "" && info.QueryCredits <= 0 {
-		fmt.Println("Warning: You have", info.QueryCredits, "query credits.")
+	// Test Shodan API if it exists
+	if *shodan_tok != "" {
+		info, err := shapi.GetAPIInfo()
+		if err != nil {
+			fmt.Println("Shodan Error:", err)
+			fmt.Println("Please fix error or remove `-shodan-key` flag")
+			os.Exit(1)
+		}
+		if info.QueryCredits <= 0 {
+			fmt.Println("Warning: You have", info.QueryCredits, "query credits. Some functionality may not be available")
+		}
 	}
 
 	// Easy stuff, serve static assets and JSON "API"
