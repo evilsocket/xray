@@ -27,28 +27,27 @@
 package xray
 
 import (
-	"fmt"
-	"regexp"
 	"bufio"
+	"fmt"
 	"net"
+	"regexp"
 )
 
 type MYSQLGrabber struct {
-
 }
 
 func (g *MYSQLGrabber) Name() string {
 	return "mysql"
 }
 
-func (g *MYSQLGrabber) Grab( port int, t *Target ) {
+func (g *MYSQLGrabber) Grab(port int, t *Target) {
 	if port != 3306 {
 		return
 	}
 
-	if conn, err := net.Dial("tcp", fmt.Sprintf("%s:%d", t.Address, port )); err == nil {
+	if conn, err := net.Dial("tcp", fmt.Sprintf("%s:%d", t.Address, port)); err == nil {
 		defer conn.Close()
-		buf := make([]byte,1024)
+		buf := make([]byte, 1024)
 		if read, err := bufio.NewReader(conn).Read(buf); err == nil && read > 0 {
 			s := string(buf[0:read])
 			re := regexp.MustCompile(".+\x0a([^\x00]+)\x00.+")

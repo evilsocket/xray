@@ -27,45 +27,45 @@
 package xray
 
 import (
-	"sync"
-	"sort"
 	"github.com/ns3777k/go-shodan/shodan"
+	"sort"
+	"sync"
 )
 
 type Target struct {
 	Address string
 	Domains []string
 	Banners map[string]string
-	Info *shodan.Host
+	Info    *shodan.Host
 
 	grabbers []Grabber
-	lock sync.Mutex
+	lock     sync.Mutex
 }
 
-func NewTarget( address string, domain string, sh *shodan.Client ) *Target {
-	t := &Target{ 
-		Address: address, 
-		Domains: []string{domain}, 
-		Banners: make(map[string]string),
-		Info:nil,
+func NewTarget(address string, domain string, sh *shodan.Client) *Target {
+	t := &Target{
+		Address:  address,
+		Domains:  []string{domain},
+		Banners:  make(map[string]string),
+		Info:     nil,
 		grabbers: make([]Grabber, 0),
 	}
 
-	t.grabbers = append( t.grabbers, &HTTPGrabber{} )
-	t.grabbers = append( t.grabbers, &DNSGrabber{} )
-	t.grabbers = append( t.grabbers, &MYSQLGrabber{} )
-	t.grabbers = append( t.grabbers, NewLineGrabber( "smtp", []int{ 25, 587 } )  )
-	t.grabbers = append( t.grabbers, NewLineGrabber( "ftp", []int{ 21} )  )
-	t.grabbers = append( t.grabbers, NewLineGrabber( "ssh", []int{ 22, 222, 2222 } )  )
-	t.grabbers = append( t.grabbers, NewLineGrabber( "pop", []int{ 110 } )  )
-	t.grabbers = append( t.grabbers, NewLineGrabber( "irc", []int{ 6667 } )  )
+	t.grabbers = append(t.grabbers, &HTTPGrabber{})
+	t.grabbers = append(t.grabbers, &DNSGrabber{})
+	t.grabbers = append(t.grabbers, &MYSQLGrabber{})
+	t.grabbers = append(t.grabbers, NewLineGrabber("smtp", []int{25, 587}))
+	t.grabbers = append(t.grabbers, NewLineGrabber("ftp", []int{21}))
+	t.grabbers = append(t.grabbers, NewLineGrabber("ssh", []int{22, 222, 2222}))
+	t.grabbers = append(t.grabbers, NewLineGrabber("pop", []int{110}))
+	t.grabbers = append(t.grabbers, NewLineGrabber("irc", []int{6667}))
 
 	t.startAsyncScan(sh)
 	return t
 }
 
 func (t Target) AddDomain(domain string) bool {
-	t.lock.Lock()	
+	t.lock.Lock()
 	defer t.lock.Unlock()
 
 	for _, d := range t.Domains {
@@ -74,23 +74,23 @@ func (t Target) AddDomain(domain string) bool {
 		}
 	}
 
-	t.Domains = append( t.Domains, domain )
+	t.Domains = append(t.Domains, domain)
 	return true
 }
 
 func (t *Target) SortedBanners() []string {
 	banners := make([]string, 0, len(t.Banners))
-	for name,_ := range t.Banners {
+	for name, _ := range t.Banners {
 		banners = append(banners, name)
 	}
 	sort.Strings(banners)
 	return banners
 }
 
-func (t* Target) startAsyncScan(sh *shodan.Client) {
+func (t *Target) startAsyncScan(sh *shodan.Client) {
 	go func() {
-		opts := shodan.HostServicesOptions{History:false,Minify:true}
-		info, err := sh.GetServicesForHost( t.Address, &opts )	
+		opts := shodan.HostServicesOptions{History: false, Minify: true}
+		info, err := sh.GetServicesForHost(t.Address, &opts)
 		if err == nil {
 			t.Info = info
 			go t.startAsyncBannerGrabbing()
@@ -98,18 +98,17 @@ func (t* Target) startAsyncScan(sh *shodan.Client) {
 	}()
 }
 
-func (t* Target) startAsyncBannerGrabbing() {
+func (t *Target) startAsyncBannerGrabbing() {
 	go func() {
 		if t.Info != nil {
 			t.Banners["grabbing"] = ""
 
 			for _, port := range t.Info.Ports {
 				for _, grabber := range t.grabbers {
-					grabber.Grab( port, t )
-					delete( t.Banners, "grabbing" )
+					grabber.Grab(port, t)
+					delete(t.Banners, "grabbing")
 				}
 			}
 		}
 	}()
 }
-

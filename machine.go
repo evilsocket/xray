@@ -36,17 +36,17 @@ import (
 // This structure contains some runtime statistics.
 type Statistics struct {
 	// Time the execution started
-	Start   time.Time
+	Start time.Time
 	// Time the execution finished
-	Stop    time.Time
+	Stop time.Time
 	// Total duration of the execution
-	Total   time.Duration
+	Total time.Duration
 	// Total number of inputs from the wordlist
-	Inputs  uint64
+	Inputs uint64
 	// Executions per second
-	Eps     float64
+	Eps float64
 	// Total number of executions
-	Execs   uint64
+	Execs uint64
 	// Total number of executions with positive results.
 	Results uint64
 	// % of progress as: ( execs / inputs ) * 100.0
@@ -55,23 +55,24 @@ type Statistics struct {
 
 // This is where the main logic goes.
 type RunHandler func(line string) interface{}
+
 // This is where positive results are handled.
 type ResultHandler func(result interface{})
 
 // The main object.
 type Machine struct {
 	// Runtime statistics.
-	Stats       Statistics
+	Stats Statistics
 	// Number of input consumers.
-	consumers   uint
+	consumers uint
 	// Dictionary file name.
-	filename    string
+	filename string
 	// Positive results channel.
-	output      chan interface{}
+	output chan interface{}
 	// Inputs channel.
-	input       chan string
+	input chan string
 	// WaitGroup to stop while the machine is running.
-	wait        sync.WaitGroup
+	wait sync.WaitGroup
 	// Main logic handler.
 	run_handler RunHandler
 	// Positive results handler.
@@ -79,7 +80,7 @@ type Machine struct {
 }
 
 // Builds a new machine object, if consumers is less or equal than 0, CPU*2 will be used as default value.
-func NewMachine( consumers int, filename string, session *Session, run_handler RunHandler, res_handler ResultHandler) *Machine {
+func NewMachine(consumers int, filename string, session *Session, run_handler RunHandler, res_handler ResultHandler) *Machine {
 	workers := uint(0)
 	if consumers <= 0 {
 		workers = uint(runtime.NumCPU() * 2)
@@ -93,7 +94,7 @@ func NewMachine( consumers int, filename string, session *Session, run_handler R
 	} else {
 		stats = &Statistics{}
 	}
-	
+
 	return &Machine{
 		Stats:       *stats,
 		consumers:   workers,
@@ -142,7 +143,7 @@ func (m *Machine) Start() error {
 		return err
 	}
 	for _ = range lines {
-		m.Stats.Inputs++	
+		m.Stats.Inputs++
 	}
 
 	lines, err = LineReader(m.filename, 0)
@@ -155,7 +156,7 @@ func (m *Machine) Start() error {
 		n := m.Stats.Execs
 		for _ = range lines {
 			n--
-			if n == 0{
+			if n == 0 {
 				break
 			}
 		}

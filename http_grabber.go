@@ -27,15 +27,15 @@
 package xray
 
 import (
-	"net/http"
 	"crypto/tls"
 	"crypto/x509"
 	"crypto/x509/pkix"
 	"fmt"
-	"net"
-	"io/ioutil"
-	"strings"
 	"golang.org/x/net/html"
+	"io/ioutil"
+	"net"
+	"net/http"
+	"strings"
 )
 
 type Dialer func(network, addr string) (net.Conn, error)
@@ -62,14 +62,13 @@ func traverseHTML(n *html.Node) (string, bool) {
 }
 
 type HTTPGrabber struct {
-
 }
 
 func (g *HTTPGrabber) Name() string {
 	return "http"
 }
 
-func makeDialer( certs *[]*x509.Certificate, skipCAVerification bool) Dialer {
+func makeDialer(certs *[]*x509.Certificate, skipCAVerification bool) Dialer {
 	return func(network, addr string) (net.Conn, error) {
 		c, err := tls.Dial(network, addr, &tls.Config{InsecureSkipVerify: skipCAVerification})
 		if err != nil {
@@ -88,77 +87,77 @@ func first(a []string) string {
 	return ""
 }
 
-func Subject2String( s pkix.Name ) string {
-	return fmt.Sprintf( "C=%s/O=%s/OU=%s/L=%s/P=%s/CN=%s", 
-		first(s.Country), 
-		first(s.Organization), 
-		first(s.OrganizationalUnit), 
-		first(s.Locality), 
-		first(s.Province), 
-		s.CommonName )
+func Subject2String(s pkix.Name) string {
+	return fmt.Sprintf("C=%s/O=%s/OU=%s/L=%s/P=%s/CN=%s",
+		first(s.Country),
+		first(s.Organization),
+		first(s.OrganizationalUnit),
+		first(s.Locality),
+		first(s.Province),
+		s.CommonName)
 }
 
-func collectCertificates( certs []*x509.Certificate, t *Target ) {
+func collectCertificates(certs []*x509.Certificate, t *Target) {
 	if certs != nil && len(certs) > 0 {
 		for i, cert := range certs {
-			t.Banners[ fmt.Sprintf("https:chain[%d]",i) ] = Subject2String( cert.Subject )
+			t.Banners[fmt.Sprintf("https:chain[%d]", i)] = Subject2String(cert.Subject)
 		}
 	}
 }
 
-func collectHeaders( resp *http.Response, t *Target ) {
+func collectHeaders(resp *http.Response, t *Target) {
 	for name, value := range resp.Header {
 		if name == "Server" {
-			t.Banners["http:server"] = strings.Trim( value[0], "\r\n\t " )
+			t.Banners["http:server"] = strings.Trim(value[0], "\r\n\t ")
 		} else if name == "X-Powered-By" {
-			t.Banners["http:poweredby"] = strings.Trim( value[0], "\r\n\t " ) 
+			t.Banners["http:poweredby"] = strings.Trim(value[0], "\r\n\t ")
 		} else if name == "Location" {
-			t.Banners["http:redirect"] = strings.Trim( value[0], "\r\n\t" )
+			t.Banners["http:redirect"] = strings.Trim(value[0], "\r\n\t")
 		}
 	}
 }
 
-func collectHTML( resp *http.Response, t *Target ) {
+func collectHTML(resp *http.Response, t *Target) {
 	if doc, err := html.Parse(resp.Body); err == nil {
 		if title, found := traverseHTML(doc); found {
-			t.Banners["html:title"] = strings.Trim( title, "\r\n\t " )
+			t.Banners["html:title"] = strings.Trim(title, "\r\n\t ")
 		}
 	}
 }
 
-func collectRobots( client *http.Client, url string, t* Target ) {
-	rob, err := client.Get( url + "robots.txt" )
+func collectRobots(client *http.Client, url string, t *Target) {
+	rob, err := client.Get(url + "robots.txt")
 	if err == nil {
 		defer rob.Body.Close()
 		if rob.StatusCode == 200 {
-			raw,err := ioutil.ReadAll(rob.Body)
+			raw, err := ioutil.ReadAll(rob.Body)
 			if err == nil {
 				data := string(raw)
-				bann := make([]string,0)
+				bann := make([]string, 0)
 
-				for _, line := range strings.Split( data, "\n" ) {
-					if strings.Contains( line, "Disallow:" ) {
-						tok := strings.Trim( strings.Split( line, "Disallow:" )[1], "\r\n\t " )
+				for _, line := range strings.Split(data, "\n") {
+					if strings.Contains(line, "Disallow:") {
+						tok := strings.Trim(strings.Split(line, "Disallow:")[1], "\r\n\t ")
 						if tok != "" {
-							bann = append( bann, tok  )
+							bann = append(bann, tok)
 						}
 					}
 
 					if len(bann) >= DisallowLimit {
-						bann = append( bann, "..." )
+						bann = append(bann, "...")
 						break
 					}
 				}
 
 				if len(bann) > 0 {
-					t.Banners["http:disallow"] = strings.Join( bann, ", " )
+					t.Banners["http:disallow"] = strings.Join(bann, ", ")
 				}
 			}
 		}
 	}
 }
 
-func (g *HTTPGrabber) Grab( port int, t *Target ) {
+func (g *HTTPGrabber) Grab(port int, t *Target) {
 	if port != 80 && port != 8080 && port != 443 && port != 8433 {
 		return
 	}
@@ -178,10 +177,10 @@ func (g *HTTPGrabber) Grab( port int, t *Target ) {
 		url = "https://" + base + "/"
 	}
 
-	certificates := make([]*x509.Certificate,0)
-    client := &http.Client{
+	certificates := make([]*x509.Certificate, 0)
+	client := &http.Client{
 		Transport: &http.Transport{
-			DialTLS: makeDialer( &certificates, true ),
+			DialTLS: makeDialer(&certificates, true),
 		},
 		CheckRedirect: func(req *http.Request, via []*http.Request) error {
 			return http.ErrUseLastResponse
@@ -192,10 +191,10 @@ func (g *HTTPGrabber) Grab( port int, t *Target ) {
 	if err == nil {
 		defer resp.Body.Close()
 
-		collectCertificates( certificates, t )
-		collectHeaders( resp, t )
-		collectHTML( resp, t )
+		collectCertificates(certificates, t)
+		collectHeaders(resp, t)
+		collectHTML(resp, t)
 	}
 
-	collectRobots( client, url, t )
+	collectRobots(client, url, t)
 }

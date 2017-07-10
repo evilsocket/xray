@@ -28,23 +28,22 @@ package xray
 
 import (
 	"fmt"
-	"regexp"
 	"github.com/miekg/dns"
+	"regexp"
 )
 
 type DNSGrabber struct {
-
 }
 
 func (g *DNSGrabber) Name() string {
 	return "dns"
 }
 
-func (g *DNSGrabber) grabChaos( addr string, q string) string {
+func (g *DNSGrabber) grabChaos(addr string, q string) string {
 	c := new(dns.Client)
 	m := new(dns.Msg)
 	m.Question = make([]dns.Question, 1)
-	m.Question[0] = dns.Question{ q, dns.TypeTXT, dns.ClassCHAOS }
+	m.Question[0] = dns.Question{q, dns.TypeTXT, dns.ClassCHAOS}
 
 	in, _, _ := c.Exchange(m, addr)
 	if in != nil && len(in.Answer) > 0 {
@@ -58,18 +57,18 @@ func (g *DNSGrabber) grabChaos( addr string, q string) string {
 	return ""
 }
 
-func (g *DNSGrabber) Grab( port int, t *Target ) {
+func (g *DNSGrabber) Grab(port int, t *Target) {
 	if port != 53 {
 		return
 	}
 
-	addr := fmt.Sprintf( "%s:53", t.Address )
+	addr := fmt.Sprintf("%s:53", t.Address)
 
-	if v := g.grabChaos( addr, "version.bind." ); v != "" {
+	if v := g.grabChaos(addr, "version.bind."); v != "" {
 		t.Banners["dns:version"] = v
 	}
 
-	if h := g.grabChaos( addr, "hostname.bind." ); h != "" {
+	if h := g.grabChaos(addr, "hostname.bind."); h != "" {
 		t.Banners["dns:hostname"] = h
 	}
 }
