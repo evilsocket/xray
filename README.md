@@ -85,6 +85,17 @@ Example:
     @ Saving session to fbi.gov-xray-session.json
     @ Web UI running on http://127.0.0.1:8080/
 
+## Building a Docker image
+
+To build a Docker image with the latest version of XRay:
+
+    git clone github.com/evilsocket/xray
+    cd xray
+    docker build -t xraydocker .
+
+Once built, XRay can be started within a Docker container using the following:
+
+    docker run --rm -it -p 8080:8080 xraydocker xray -address 0.0.0.0 -domain example.com -shodan-key shodan_key_here
 
 ## License
 
