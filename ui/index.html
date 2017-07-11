@@ -12,6 +12,8 @@
     <script src="/angular.min.js"></script>
     <script src="/index.js"></script>
 
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.6.0/Chart.bundle.min.js" integrity="sha256-VNbX9NjQNRW+Bk02G/RO6WiTKuhncWI4Ey7LkSbE+5s=" crossorigin="anonymous"></script>
+
 <style>
 .borderless {
   background-color: initial !important;
@@ -56,16 +58,32 @@
           <td colspan="2">
             <div class="input-group" style="width:100%">
               <label class="btn btn-default input-group-addon" id="basic-addon3">
-                <input type="checkbox" id="hide_empty" autocomplete="off"> Hide Empty Rows
+                <input type="checkbox" id="show_empty" autocomplete="off" checked> Empty Rows
               </label>
-              <input type="text" class="form-control" id="search" placeholder="Search ..." aria-describedby="basic-addon3">
+              <label class="btn btn-default input-group-addon" id="basic-addon4">
+                <input type="checkbox" id="show_charts" autocomplete="off" checked> Charts
+              </label>
+              <input type="text" class="form-control" id="search" placeholder="Search ..." aria-describedby="basic-addon4">
             </div>
 
           </td>
         </tr> 
       </table>
 
-
+      <table class="table" id="charts">
+        <tr>
+          <td>
+            <div style="width:50%;">
+              <canvas id="countries_chart"></canvas>
+            </div>
+          </td>
+          <td>
+            <div style="width:50%;">
+              <canvas id="ports_chart"></canvas>
+            </div>
+          </td>
+        </tr>
+      </table>
 
       <table class="table table-striped">
         <thead>

@@ -55,7 +55,7 @@ app.controller('XRayController', ['$scope', function (scope) {
                 scope.duration = dur.toISOString().substr(11, 8);;
             }
 
-            if( $('#hide_empty').is(':checked') == true ) {
+            if( $('#show_empty').is(':checked') == false ) {
                 var filtered = {};
                 for( var ip in data.targets ) {
                     var t = data.targets[ip];
@@ -91,6 +91,77 @@ app.controller('XRayController', ['$scope', function (scope) {
             scope.stats = data.stats;
             
             document.title = "XRAY ( " + scope.domain + " | " + scope.stats.Progress.toFixed(2) + "% )";
+
+            if( $('#show_charts').is(':checked') == true ) {
+                $('#charts').show();
+
+                var countries_chart_data = {
+                    datasets:[{
+                        label: 'Hosts/Countries',
+                        data: []
+                    }],     
+
+                    labels: []
+                };
+                var countries_chart_opts = {
+                };
+
+                var ports_chart_data = {
+                    datasets:[{
+                        label: 'Hosts/Port',
+                        data: []
+                    }],     
+
+                    labels: []
+                };
+                var ports_chart_opts = {
+                };
+                
+                for( var ip in data.targets ) {
+                    var t = data.targets[ip];
+
+                    if( t.Info != null && t.Info.country_code != "" ) {
+                        var c = t.Info.country_code;
+                        var idx = countries_chart_data.labels.indexOf(c);
+                        
+                        if( idx == -1 ) {
+                            countries_chart_data.labels.push(c);
+                            countries_chart_data.datasets[0].data.push(1)
+                        } else {
+                            countries_chart_data.datasets[0].data[idx] += 1
+                        }
+                    }
+
+                    if( t.Info != null && t.Info.ports != [] ) {
+                        for( var i in t.Info.ports ) {
+                            var port = t.Info.ports[i];
+                            var sport = ""+port;
+                            var idx = ports_chart_data.labels.indexOf(sport);
+                            
+                            if( idx == -1 ) {
+                                ports_chart_data.labels.push(sport);
+                                ports_chart_data.datasets[0].data.push(1)
+                            } else {
+                                ports_chart_data.datasets[0].data[idx] += 1
+                            }
+                        }
+                    }
+                }
+                
+                var countries_chart = new Chart( 'countries_chart',{
+                    type: 'horizontalBar',
+                    data: countries_chart_data,
+                    options: countries_chart_opts
+                });
+
+                var ports_chart = new Chart( 'ports_chart',{
+                    type: 'bar',
+                    data: ports_chart_data,
+                    options: ports_chart_opts
+                });
+            } else {
+                $('#charts').hide();
+            }
 
             scope.$apply();
         });
