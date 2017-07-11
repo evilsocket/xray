@@ -1,6 +1,8 @@
 hash: ea28ba13cd0d733cabb52755d42b0e3219337e98dee552c0758e441f8e08ccd2
-updated: 2017-07-09T12:31:04.714797116+02:00
+updated: 2017-07-11T14:44:35.921097867+02:00
 imports:
+- name: github.com/andybalholm/cascadia
+  version: 349dd0209470eabd9514242c688c403c0926d266
 - name: github.com/bobesa/go-domain-util
   version: b0f58b2366836c2600dac855dc832a774fc19b6e
   subpackages:
@@ -18,7 +20,7 @@ imports:
   subpackages:
   - static
 - name: github.com/gin-gonic/gin
-  version: df3b79e805233f553c0495cfa1fb76766b9d80b3
+  version: 02a6f9b6bc8ffba2e8b55ca78d5a9448ea8aef1e
   subpackages:
   - binding
   - render
@@ -31,7 +33,7 @@ imports:
   subpackages:
   - query
 - name: github.com/json-iterator/go
-  version: d336ee6da6782079e23b6e84e4f3c9a36e31fe06
+  version: 845d8438db34cc782608bbee7647a522b4e87de0
 - name: github.com/mattn/go-isatty
   version: 57fdcb988a5c543893cc61bce354a6e24ab70022
 - name: github.com/miekg/dns
@@ -42,6 +44,8 @@ imports:
   - shodan
 - name: github.com/olekukonko/tablewriter
   version: febf2d34b54a69ce7530036c7503b1c9fbfdf0bb
+- name: github.com/PuerkitoBio/goquery
+  version: 8806ada2a4ab225c06e9106f9631be80932db7ce
 - name: github.com/ugorji/go
   version: 5efa3251c7f7d05e5d9704a69a984ec9f1386a40
   subpackages:
@@ -52,7 +56,7 @@ imports:
   - html
   - html/atom
 - name: golang.org/x/sys
-  version: 739734461d1c916b6c72a63d7efda2b27edb369f
+  version: abf9c25f54453410d0c6668e519582a9e1115027
   subpackages:
   - unix
 - name: gopkg.in/go-playground/validator.v8
