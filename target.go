@@ -32,23 +32,34 @@ import (
 	"sync"
 )
 
+type HistoryEntry struct {
+	Address  string `json:"ip"`
+	Location string `json:"location"`
+	ISP      string `json:"owner"`
+	Updated  string `json:"lastseen"`
+}
+
 type Target struct {
 	Address string
 	Domains []string
 	Banners map[string]string
 	Info    *shodan.Host
+    History  map[string][]HistoryEntry
 
+	vdns    *ViewDNS
 	grabbers []Grabber
 	lock     sync.Mutex
 }
 
-func NewTarget(address string, domain string, sh *shodan.Client) *Target {
+func NewTarget(address string, domain string, sh *shodan.Client, vdns *ViewDNS) *Target {
 	t := &Target{
 		Address:  address,
 		Domains:  []string{domain},
 		Banners:  make(map[string]string),
+		History:  make(map[string][]HistoryEntry),
 		Info:     nil,
 		grabbers: make([]Grabber, 0),
+		vdns: vdns,
 	}
 
 	t.grabbers = append(t.grabbers, &HTTPGrabber{})
@@ -60,6 +71,7 @@ func NewTarget(address string, domain string, sh *shodan.Client) *Target {
 	t.grabbers = append(t.grabbers, NewLineGrabber("pop", []int{110}))
 	t.grabbers = append(t.grabbers, NewLineGrabber("irc", []int{6667}))
 
+	t.scanDomainAsync(domain)
 	t.startAsyncScan(sh)
 	return t
 }
@@ -75,6 +87,11 @@ func (t Target) AddDomain(domain string) bool {
 	}
 
 	t.Domains = append(t.Domains, domain)
+
+	if _, ok := t.History[domain]; ok == false {
+		t.scanDomainAsync(domain)
+	}
+
 	return true
 }
 
@@ -85,6 +102,14 @@ func (t *Target) SortedBanners() []string {
 	}
 	sort.Strings(banners)
 	return banners
+}
+
+func (t Target) scanDomainAsync(domain string) {
+	go func(t *Target, domain string) {
+		t.lock.Lock()
+		defer t.lock.Unlock()
+		t.History[domain] = t.vdns.GetHistory(domain)
+	}(&t, domain)
 }
 
 func (t *Target) startAsyncScan(sh *shodan.Client) {

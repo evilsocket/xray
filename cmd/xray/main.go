@@ -72,7 +72,7 @@ func OnResult(res interface{}) {
 
 		t := pool.Find(address)
 		if t == nil {
-			pool.Add(xray.NewTarget(address, result.hostname, shapi))
+			pool.Add(xray.NewTarget(address, result.hostname, shapi, vdns))
 			pool.FlushSession(&bruter.Stats)
 		} else {
 			if t.AddDomain(result.hostname) == true {
@@ -86,16 +86,18 @@ var (
 	session *xray.Session
 	pool    *xray.Pool
 	shapi   *shodan.Client
+	vdns    *xray.ViewDNS
 	bruter  *xray.Machine
 	router  *gin.Engine
 
-	base       = flag.String("domain", "", "Base domain to start enumeration from.")
-	wordlist   = flag.String("wordlist", "wordlists/default.lst", "Wordlist file to use for enumeration.")
-	consumers  = flag.Int("consumers", 16, "Number of concurrent consumers to use for subdomain enumeration.")
-	shodan_tok = flag.String("shodan-key", "", "Shodan API key.")
-	address    = flag.String("address", "127.0.0.1", "IP address to bind the web ui server to.")
-	sesfile    = flag.String("session", xray.SessionDefaultFilename, "Session file name.")
-	port       = flag.Int("port", 8080, "TCP port to bind the web ui server to.")
+	base        = flag.String("domain", "", "Base domain to start enumeration from.")
+	wordlist    = flag.String("wordlist", "wordlists/default.lst", "Wordlist file to use for enumeration.")
+	consumers   = flag.Int("consumers", 16, "Number of concurrent consumers to use for subdomain enumeration.")
+	shodan_tok  = flag.String("shodan-key", "", "Shodan API key.")
+	viewdns_tok = flag.String("viewdns-key", "", "ViewDNS API key.")
+	address     = flag.String("address", "127.0.0.1", "IP address to bind the web ui server to.")
+	sesfile     = flag.String("session", xray.SessionDefaultFilename, "Session file name.")
+	port        = flag.Int("port", 8080, "TCP port to bind the web ui server to.")
 )
 
 func main() {
@@ -126,6 +128,7 @@ func main() {
 	session = xray.NewSession(*sesfile)
 	pool = xray.NewPool(session)
 	shapi = shodan.NewClient(nil, *shodan_tok)
+	vdns = xray.NewViewDNS(*viewdns_tok)
 	bruter = xray.NewMachine(*consumers, *wordlist, session, DoRequest, OnResult)
 	router = gin.New()
 

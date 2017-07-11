@@ -28,6 +28,12 @@ var app = angular.module('XRAY', [], function($interpolateProvider) {
 
 });
 
+app.filter('toid', function() {
+    return function(domain) {
+       return domain.replace( /[^a-z0-9_]/g, '_' )
+    }
+});
+
 app.controller('XRayController', ['$scope', function (scope) {
     scope.domain = "";
     scope.stats = {
@@ -174,8 +180,15 @@ app.controller('XRayController', ['$scope', function (scope) {
 
             scope.$apply();
             scope.firstTimeUpdate = true;
+
+            $('.htoggle').each(function() {
+                $(this).click(function(e){
+                    $( $(this).attr('href') ).toggle();
+                    return false;
+                });
+            });
         });
     }
 
-    setInterval( scope.update, 500 );
+    setInterval( scope.update, 1500 );
 }]);

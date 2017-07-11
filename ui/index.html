@@ -14,6 +14,7 @@
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.6.0/Chart.bundle.min.js" integrity="sha256-VNbX9NjQNRW+Bk02G/RO6WiTKuhncWI4Ey7LkSbE+5s=" crossorigin="anonymous"></script>
 
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css">
 <style>
 .borderless {
   background-color: initial !important;
@@ -105,7 +106,27 @@
             </td>
             
             <td>
-              <span ng-repeat="domain in t.Domains">{{ domain + ($last ? '' : ', ') }}</span> 
+              <span ng-repeat="domain in t.Domains">
+                {{ domain + ($last ? '' : ', ') }}
+                <span ng-if="t.History[domain]">
+                  <a href="#table_{{ ( t.Address + domain ) | toid }}" class="htoggle">
+                    <i class="fa fa-history" aria-hidden="true"></i>
+                  </a>
+
+                  <div id="table_{{ ( t.Address + domain ) | toid }}" style="display:none">
+                    <br/>
+                    Domain History
+                    <table class="table table-striped">
+                      <tr ng-repeat="h in t.History[domain]">
+                        <td>{{ h.ip }}</td> 
+                        <td>{{ h.location }}</td> 
+                        <td>{{ h.owner }}</td> 
+                        <td>{{ h.lastseen }}</td> 
+                      </tr>
+                    </table>
+                  </div>
+                </span>
+              </span> 
             </td>
 
             <td>

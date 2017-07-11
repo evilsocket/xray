@@ -1,8 +1,6 @@
 hash: ea28ba13cd0d733cabb52755d42b0e3219337e98dee552c0758e441f8e08ccd2
-updated: 2017-07-11T14:44:35.921097867+02:00
+updated: 2017-07-11T15:23:37.204299308+02:00
 imports:
-- name: github.com/andybalholm/cascadia
-  version: 349dd0209470eabd9514242c688c403c0926d266
 - name: github.com/bobesa/go-domain-util
   version: b0f58b2366836c2600dac855dc832a774fc19b6e
   subpackages:
@@ -44,8 +42,6 @@ imports:
   - shodan
 - name: github.com/olekukonko/tablewriter
   version: febf2d34b54a69ce7530036c7503b1c9fbfdf0bb
-- name: github.com/PuerkitoBio/goquery
-  version: 8806ada2a4ab225c06e9106f9631be80932db7ce
 - name: github.com/ugorji/go
   version: 5efa3251c7f7d05e5d9704a69a984ec9f1386a40
   subpackages:
