@@ -90,7 +90,7 @@ app.controller('XRayController', ['$scope', function (scope) {
             scope.domain = data.domain;
             scope.stats = data.stats;
             
-            document.title = "XRAY ( " + scope.domain + " | " + scope.stats.Progress + "% )";
+            document.title = "XRAY ( " + scope.domain + " | " + scope.stats.Progress.toFixed(2) + "% )";
 
             scope.$apply();
         });
