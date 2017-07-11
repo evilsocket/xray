@@ -43,58 +43,13 @@ app.controller('XRayController', ['$scope', function (scope) {
     scope.targets = { };
     scope.ntargets = 0;
     scope.duration = 0;
+    scope.firstTimeUpdate = false;
 
-    scope.update = function() {
-        $.get('/targets', function(data) {
-            if( scope.stats.Progress < 100.0 || scope.stats.Progress == 0.0 ) {
-                var start = new Date(data.stats.Start),
-                    stop = new Date(data.stats.Stop),
-                    dur = new Date(null);
+    scope.updateCharts = function(data) {
+        if( $('#show_charts').is(':checked') == true ) {
+            $('#charts').show();
 
-                dur.setSeconds( (stop-start) / 1000 );
-                scope.duration = dur.toISOString().substr(11, 8);;
-            }
-
-            if( $('#show_empty').is(':checked') == false ) {
-                var filtered = {};
-                for( var ip in data.targets ) {
-                    var t = data.targets[ip];
-                    if( t.Info != null && t.Info.ports.length > 0 ) {
-                        filtered[ip] = t;
-                    }
-                }
-
-                data.targets = filtered;
-            }
-
-            var search = $('#search').val();
-            if( search != "" ) {
-                search = search.toLowerCase();
-
-                var filtered = {};
-                for( var ip in data.targets ) {
-                    var t = data.targets[ip];
-                    var txt = JSON.stringify(t).toLowerCase();
-                    if( txt.search(search) >= 0 ) {
-                        filtered[ip] = t;
-                    }
-                }
-
-                console.log(filtered);
-
-                data.targets = filtered;
-            }
-
-            scope.targets = data.targets;
-            scope.ntargets = Object.keys(scope.targets).length;
-            scope.domain = data.domain;
-            scope.stats = data.stats;
-            
-            document.title = "XRAY ( " + scope.domain + " | " + scope.stats.Progress.toFixed(2) + "% )";
-
-            if( $('#show_charts').is(':checked') == true ) {
-                $('#charts').show();
-
+            if( data.stats.Progress < 100.0 || scope.firstTimeUpdate == false ) {
                 var countries_chart_data = {
                     datasets:[{
                         label: 'Hosts/Countries',
@@ -159,11 +114,66 @@ app.controller('XRayController', ['$scope', function (scope) {
                     data: ports_chart_data,
                     options: ports_chart_opts
                 });
-            } else {
-                $('#charts').hide();
+            }
+        } else {
+            $('#charts').hide();
+        }
+    };
+
+    scope.applyFilters = function(data) {
+        if( $('#show_empty').is(':checked') == false ) {
+            var filtered = {};
+            for( var ip in data.targets ) {
+                var t = data.targets[ip];
+                if( t.Info != null && t.Info.ports.length > 0 ) {
+                    filtered[ip] = t;
+                }
             }
 
+            data.targets = filtered;
+        }
+
+        var search = $('#search').val();
+        if( search != "" ) {
+            search = search.toLowerCase();
+
+            var filtered = {};
+            for( var ip in data.targets ) {
+                var t = data.targets[ip];
+                var txt = JSON.stringify(t).toLowerCase();
+                if( txt.search(search) >= 0 ) {
+                    filtered[ip] = t;
+                }
+            }
+
+            data.targets = filtered;
+        }
+    };
+
+    scope.update = function() {
+        $.get('/targets', function(data) {
+            if( data.stats.Progress < 100.0 || scope.firstTimeUpdate == false ) {
+                var start = new Date(data.stats.Start),
+                    stop = new Date(data.stats.Stop),
+                    dur = new Date(null);
+
+                dur.setSeconds( (stop-start) / 1000 );
+                scope.duration = dur.toISOString().substr(11, 8);
+            }
+            
+            scope.ntargets = Object.keys(scope.targets).length;
+
+            scope.updateCharts(data);
+            scope.applyFilters(data);
+
+            scope.targets = data.targets;
+            scope.domain = data.domain;
+            scope.stats = data.stats;
+            
+            document.title = "XRAY ( " + scope.domain + " | " + scope.stats.Progress.toFixed(2) + "% )";
+
             scope.$apply();
+            scope.firstTimeUpdate = true;
         });
     }
 
