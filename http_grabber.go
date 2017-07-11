@@ -171,7 +171,7 @@ func (g *HTTPGrabber) Grab(port int, t *Target) {
 		base = t.Address
 	}
 
-	if port == 80 {
+	if port == 80 || port == 8080 {
 		url = "http://" + base + "/"
 	} else if port == 443 || port == 8433 {
 		url = "https://" + base + "/"
