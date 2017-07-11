@@ -12,8 +12,6 @@
     <script src="/angular.min.js"></script>
     <script src="/index.js"></script>
 
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.6.0/Chart.bundle.min.js" integrity="sha256-VNbX9NjQNRW+Bk02G/RO6WiTKuhncWI4Ey7LkSbE+5s=" crossorigin="anonymous"></script>
-
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css">
 <style>
 .borderless {
@@ -61,29 +59,11 @@
               <label class="btn btn-default input-group-addon" id="basic-addon3">
                 <input type="checkbox" id="show_empty" autocomplete="off" checked> Empty Rows
               </label>
-              <label class="btn btn-default input-group-addon" id="basic-addon4">
-                <input type="checkbox" id="show_charts" autocomplete="off" checked> Charts
-              </label>
-              <input type="text" class="form-control" id="search" placeholder="Search ..." aria-describedby="basic-addon4">
+              <input type="text" class="form-control" id="search" placeholder="Search ..." aria-describedby="basic-addon3">
             </div>
 
           </td>
         </tr> 
-      </table>
-
-      <table class="table" id="charts">
-        <tr>
-          <td>
-            <div style="width:50%;">
-              <canvas id="countries_chart"></canvas>
-            </div>
-          </td>
-          <td>
-            <div style="width:50%;">
-              <canvas id="ports_chart"></canvas>
-            </div>
-          </td>
-        </tr>
       </table>
 
       <table class="table table-striped">
