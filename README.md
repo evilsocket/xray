@@ -52,7 +52,7 @@ Once built, XRay can be started within a Docker container using the following:
 
     docker run --rm -it -p 8080:8080 xraydocker xray -address 0.0.0.0 -shodan-key shodan_key_here -domain example.com 
 
-## Manual Installation
+## Manual Compilation
 
 Make sure you are using **Go >= 1.7**, that your installation is working properly, that you have set the `$GOPATH` variable and you have appended `$GOPATH/bin` to your `$PATH`.
 
