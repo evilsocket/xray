@@ -127,33 +127,39 @@ func collectHTML(resp *http.Response, t *Target) {
 
 func collectRobots(client *http.Client, url string, t *Target) {
 	rob, err := client.Get(url + "robots.txt")
-	if err == nil {
-		defer rob.Body.Close()
-		if rob.StatusCode == 200 {
-			raw, err := ioutil.ReadAll(rob.Body)
-			if err == nil {
-				data := string(raw)
-				bann := make([]string, 0)
+	if err != nil {
+		return
+	}
+	defer rob.Body.Close()
 
-				for _, line := range strings.Split(data, "\n") {
-					if strings.Contains(line, "Disallow:") {
-						tok := strings.Trim(strings.Split(line, "Disallow:")[1], "\r\n\t ")
-						if tok != "" {
-							bann = append(bann, tok)
-						}
-					}
+	if rob.StatusCode != 200 {
+		return
+	}
 
-					if len(bann) >= DisallowLimit {
-						bann = append(bann, "...")
-						break
-					}
-				}
+	raw, err := ioutil.ReadAll(rob.Body)
+	if err != nil {
+		return
+	}
 
-				if len(bann) > 0 {
-					t.Banners["http:disallow"] = strings.Join(bann, ", ")
-				}
+	data := string(raw)
+	bann := make([]string, 0)
+
+	for _, line := range strings.Split(data, "\n") {
+		if strings.Contains(line, "Disallow:") {
+			tok := strings.Trim(strings.Split(line, "Disallow:")[1], "\r\n\t ")
+			if tok != "" {
+				bann = append(bann, tok)
 			}
 		}
+
+		if len(bann) >= DisallowLimit {
+			bann = append(bann, "...")
+			break
+		}
+	}
+
+	if len(bann) > 0 {
+		t.Banners["http:disallow"] = strings.Join(bann, ", ")
 	}
 }
 
