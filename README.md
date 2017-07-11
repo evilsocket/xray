@@ -34,7 +34,19 @@ The software will rely on your main DNS resolver in order to enumerate subdomain
 
 If I were you, I'd find a way to proxify the whole process ... #justsaying
 
-## Installation
+## Building a Docker image
+
+To build a Docker image with the latest version of XRay:
+
+    git clone github.com/evilsocket/xray
+    cd xray
+    docker build -t xraydocker .
+
+Once built, XRay can be started within a Docker container using the following:
+
+    docker run --rm -it -p 8080:8080 xraydocker xray -address 0.0.0.0 -shodan-key shodan_key_here -domain example.com 
+
+## Manual Installation
 
 Make sure you are using **Go >= 1.7**, that your installation is working properly, that you have set the `$GOPATH` variable and you have appended `$GOPATH/bin` to your `$PATH`.
 
@@ -84,18 +96,6 @@ Example:
 
     @ Saving session to fbi.gov-xray-session.json
     @ Web UI running on http://127.0.0.1:8080/
-
-## Building a Docker image
-
-To build a Docker image with the latest version of XRay:
-
-    git clone github.com/evilsocket/xray
-    cd xray
-    docker build -t xraydocker .
-
-Once built, XRay can be started within a Docker container using the following:
-
-    docker run --rm -it -p 8080:8080 xraydocker xray -address 0.0.0.0 -domain example.com -shodan-key shodan_key_here
 
 ## License
 
