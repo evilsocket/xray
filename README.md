@@ -10,8 +10,9 @@ XRay is a very simple tool, it works this way:
 
 1. It'll bruteforce subdomains using a wordlist and DNS requests.
 2. For every subdomain/ip found, it'll use Shodan to gather open ports and other intel.
-3. For every unique ip address, and for every open port, it'll launch specific banner grabbers and info collectors.
-4. Eventually the data is presented to the user on the web ui.
+3. If a ViewDNS API key is provided, for every subdomain historical data will be collected.
+4. For every unique ip address, and for every open port, it'll launch specific banner grabbers and info collectors.
+5. Eventually the data is presented to the user on the web ui.
 
 **Grabbers and Collectors**
 
@@ -27,6 +28,11 @@ XRay is a very simple tool, it works this way:
 **Shodan API Key**
 
 The [shodan.io](https://www.shodan.io/) API key parameter ( `-shodan-key KEY` ) is optional, however if not specified, no service fingerprinting will be performed and a lot less information will be shown (basically it just gonna be DNS subdomain enumeration).
+
+**ViewDNS API Key**
+
+If a [ViewDNS](http://viewdns.info/) API key parameter ( `-viewdns-key KEY` ) is passed, domain historical data will also be retrieved.
+
 
 **Anonymity and Legal Issues**
 
@@ -80,12 +86,14 @@ You'll find the executable in the `build` folder.
             Session file name. (default "<domain-name>-xray-session.json")
       -shodan-key string
             Shodan API key.
+      -viewdns-key string
+            ViewDNS API key.
       -wordlist string
             Wordlist file to use for enumeration. (default "wordlists/default.lst")
 
 Example:
 
-    # xray -shodan-key yadayadayadapicaboo... -domain fbi.gov
+    # xray -shodan-key yadayadayadapicaboo... -viewdns-key foobarsomethingsomething... -domain fbi.gov
 
     ____  ___
     \   \/  /
