@@ -44,7 +44,7 @@ If I were you, I'd find a way to proxify the whole process ... #justsaying
 
 To build a Docker image with the latest version of XRay:
 
-    git clone github.com/evilsocket/xray
+    git clone https://github.com/evilsocket/xray.git
     cd xray
     docker build -t xraydocker .
 
