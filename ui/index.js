@@ -114,5 +114,5 @@ app.controller('XRayController', ['$scope', function (scope) {
         });
     }
 
-    setInterval( scope.update, 1500 );
+    setInterval( scope.update, 500 );
 }]);
