@@ -82,6 +82,8 @@ You'll find the executable in the `build` folder.
             Base domain to start enumeration from.
       -port int
             TCP port to bind the web ui server to. (default 8080)
+      -preserve-domain
+            Do not remove subdomain from the provided domain name.
       -session string
             Session file name. (default "<domain-name>-xray-session.json")
       -shodan-key string

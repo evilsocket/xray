@@ -91,6 +91,7 @@ var (
 	router  *gin.Engine
 
 	base        = flag.String("domain", "", "Base domain to start enumeration from.")
+	pres_dom    = flag.Bool( "preserve-domain", false, "Do not remove subdomain from the provided domain name.")
 	wordlist    = flag.String("wordlist", "wordlists/default.lst", "Wordlist file to use for enumeration.")
 	consumers   = flag.Int("consumers", 16, "Number of concurrent consumers to use for subdomain enumeration.")
 	shodan_tok  = flag.String("shodan-key", "", "Shodan API key.")
@@ -111,7 +112,11 @@ func main() {
 	fmt.Println("      \\_/")
 	fmt.Println("")
 
-	if *base = domainutil.Domain(*base); *base == "" {
+	if *pres_dom == false {
+		*base = domainutil.Domain(*base)
+	}
+
+	if *base == "" {
 		fmt.Println("Invalid or empty domain specified.")
 		flag.Usage()
 		os.Exit(1)
