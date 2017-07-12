@@ -88,7 +88,7 @@
             <td>
               <span ng-repeat="domain in t.Domains">
                 {{ domain + ($last ? '' : ', ') }}
-                <span ng-if="t.History[domain]">
+                <span ng-if="t.History[domain].length > 0">
                   <a href="#table_{{ ( t.Address + domain ) | toid }}" class="htoggle">
                     <i class="fa fa-history" aria-hidden="true"></i>
                   </a>
