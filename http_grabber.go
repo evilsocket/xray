@@ -35,6 +35,7 @@ import (
 	"io/ioutil"
 	"net"
 	"net/http"
+	"regexp"
 	"strings"
 )
 
@@ -118,9 +119,24 @@ func collectHeaders(resp *http.Response, t *Target) {
 }
 
 func collectHTML(resp *http.Response, t *Target) {
-	if doc, err := html.Parse(resp.Body); err == nil {
-		if title, found := traverseHTML(doc); found {
-			t.Banners["html:title"] = strings.Trim(title, "\r\n\t ")
+	if raw_body, err := ioutil.ReadAll(resp.Body); err == nil {
+		data := string(raw_body)
+
+		// check if this is an Amazon bucket ... FUCK XML PARSERS!
+		if strings.Contains( data, "ListBucketResult" ) && strings.Contains( data, "<Name>" ) {
+			re := regexp.MustCompile(".*<Name>([^<]+)</Name>.*")
+			match := re.FindStringSubmatch(data)
+			if len(match) > 0 {
+				t.Banners["amazon:bucket"] = match[1]
+			}
+		}
+
+		// parse HTML for the title tag
+		reader := strings.NewReader(data)
+		if doc, err := html.Parse(reader); err == nil {
+			if title, found := traverseHTML(doc); found {
+				t.Banners["html:title"] = strings.Trim(title, "\r\n\t ")
+			}
 		}
 	}
 }
