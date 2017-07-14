@@ -28,6 +28,7 @@ package xray
 
 import (
 	"sync"
+	"strings"
 ) 
 
 var (
@@ -49,4 +50,14 @@ func GetContext() *Context {
 	}
 
 	return instance
+}
+
+func (c *Context) GetSubDomain(domain string) string {
+	if strings.HasSuffix( domain, c.Domain ) == true && domain != c.Domain {
+		subdomain := strings.Replace( domain, "." + c.Domain, "", -1 )
+		if subdomain != "*" && subdomain != "" {
+			return subdomain
+		}
+	}
+	return ""
 }

@@ -108,20 +108,14 @@ func collectCertificates(certs []*x509.Certificate, t *Target) {
 			// Check for domains
 			if ctx != nil {
 				// Search in common name.
-				if strings.HasSuffix( cert.Subject.CommonName, ctx.Domain ) == true && cert.Subject.CommonName != ctx.Domain {
-					subdomain := strings.Replace( cert.Subject.CommonName, "." + ctx.Domain, "", -1 )
-					if subdomain != "*" && subdomain != "" {
-						ctx.Bruter.AddInput(subdomain)
-					}
+				if sub := ctx.GetSubDomain( cert.Subject.CommonName ); sub != "" {
+					ctx.Bruter.AddInput(sub)
 				}
-				
+
 				// Search in alternative names.
 				for _, name := range cert.DNSNames {
-					if strings.HasSuffix( name, ctx.Domain ) == true && name != ctx.Domain {
-						subdomain := strings.Replace( name, "." + ctx.Domain, "", -1 )
-						if subdomain != "*" && subdomain != "" {
-							ctx.Bruter.AddInput(subdomain)
-						}
+					if sub := ctx.GetSubDomain(name); sub != "" {
+						ctx.Bruter.AddInput(sub)
 					}
 				}
 			}
