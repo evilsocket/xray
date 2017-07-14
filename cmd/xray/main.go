@@ -172,7 +172,7 @@ func main() {
 			c.Bruter.UpdateStats()
 			c.Pool.FlushSession(&c.Bruter.Stats)
 
-			if c.Bruter.Stats.Progress < 100.0 {
+			if c.Bruter.Stats.Progress < 100.0 && c.Bruter.Stats.Progress > 0 && uint32(c.Bruter.Stats.Progress)%10 == 0 {
 				fmt.Printf("%.2f %% completed, %.2f req/s, %d unique targets found so far ...\n", c.Bruter.Stats.Progress, c.Bruter.Stats.Eps, len(c.Session.Targets))
 			}
 		}
