@@ -66,7 +66,9 @@ func GetContext() *Context {
 	defer lock.Unlock()
 
 	if instance == nil {
-		instance = &Context{}
+		// this should not happen as the instance is
+		// initialized in main
+		panic("(╯°□°）╯︵ ┻━┻")
 	}
 
 	return instance
