@@ -18,7 +18,7 @@ XRay is a very simple tool, it works this way:
 
 * **HTTP** `Server`, `X-Powered-By` and `Location` headers.
 * **HTTP** and **HTTPS** `robots.txt` disallowed entries.
-* **HTTPS** certificates chain.
+* **HTTPS** certificates chain ( with recursive subdomain grabbing from CN and Alt Names ).
 * **HTML** `title` tag.
 * **DNS** `version.bind.` and `hostname.bind.` records.
 * **MySQL**, **SMTP**, **FTP**, **SSH**, **POP** and **IRC** banners.
