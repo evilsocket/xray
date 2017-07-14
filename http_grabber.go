@@ -111,7 +111,6 @@ func collectCertificates(certs []*x509.Certificate, t *Target) {
 				if strings.HasSuffix( cert.Subject.CommonName, ctx.Domain ) == true && cert.Subject.CommonName != ctx.Domain {
 					subdomain := strings.Replace( cert.Subject.CommonName, "." + ctx.Domain, "", -1 )
 					if subdomain != "*" && subdomain != "" {
-						fmt.Printf( "CommonName: %s (%s)\n", cert.Subject.CommonName, subdomain )
 						ctx.Bruter.AddInput(subdomain)
 					}
 				}
