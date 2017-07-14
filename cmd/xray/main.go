@@ -92,7 +92,7 @@ var (
 	router  *gin.Engine
 
 	base        = flag.String("domain", "", "Base domain to start enumeration from.")
-	pres_dom    = flag.Bool( "preserve-domain", false, "Do not remove subdomain from the provided domain name.")
+	pres_dom    = flag.Bool("preserve-domain", false, "Do not remove subdomain from the provided domain name.")
 	wordlist    = flag.String("wordlist", "wordlists/default.lst", "Wordlist file to use for enumeration.")
 	consumers   = flag.Int("consumers", 16, "Number of concurrent consumers to use for subdomain enumeration.")
 	shodan_tok  = flag.String("shodan-key", "", "Shodan API key.")
@@ -182,7 +182,7 @@ func main() {
 	// Save session and print progress every 10s.
 	go func() {
 		ticker := time.NewTicker(time.Millisecond * 10000)
-		for _ = range ticker.C {
+		for range ticker.C {
 			bruter.UpdateStats()
 			pool.FlushSession(&bruter.Stats)
 

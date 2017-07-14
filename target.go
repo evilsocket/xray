@@ -44,9 +44,9 @@ type Target struct {
 	Domains []string
 	Banners map[string]string
 	Info    *shodan.Host
-    History  map[string][]HistoryEntry
+	History map[string][]HistoryEntry
 
-	vdns    *ViewDNS
+	vdns     *ViewDNS
 	grabbers []Grabber
 	lock     sync.Mutex
 }
@@ -59,7 +59,7 @@ func NewTarget(address string, domain string, sh *shodan.Client, vdns *ViewDNS) 
 		History:  make(map[string][]HistoryEntry),
 		Info:     nil,
 		grabbers: make([]Grabber, 0),
-		vdns: vdns,
+		vdns:     vdns,
 	}
 
 	t.grabbers = append(t.grabbers, &HTTPGrabber{})
@@ -97,7 +97,7 @@ func (t Target) AddDomain(domain string) bool {
 
 func (t *Target) SortedBanners() []string {
 	banners := make([]string, 0, len(t.Banners))
-	for name, _ := range t.Banners {
+	for name := range t.Banners {
 		banners = append(banners, name)
 	}
 	sort.Strings(banners)

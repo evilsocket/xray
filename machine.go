@@ -147,7 +147,7 @@ func (m *Machine) Start() error {
 	if err != nil {
 		return err
 	}
-	for _ = range lines {
+	for range lines {
 		m.Stats.Inputs++
 	}
 
@@ -159,7 +159,7 @@ func (m *Machine) Start() error {
 	// If the stats have been loaded from a session file.
 	if m.Stats.Execs > 0 {
 		n := m.Stats.Execs
-		for _ = range lines {
+		for range lines {
 			n--
 			if n == 0 {
 				break

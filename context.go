@@ -27,18 +27,18 @@
 package xray
 
 import (
-	"sync"
 	"strings"
-) 
+	"sync"
+)
 
 var (
 	instance *Context = nil
-	lock sync.Mutex
+	lock     sync.Mutex
 )
 
 type Context struct {
 	Domain string
-	Bruter *Machine	
+	Bruter *Machine
 }
 
 func GetContext() *Context {
@@ -53,8 +53,8 @@ func GetContext() *Context {
 }
 
 func (c *Context) GetSubDomain(domain string) string {
-	if strings.HasSuffix( domain, c.Domain ) == true && domain != c.Domain {
-		subdomain := strings.Replace( domain, "." + c.Domain, "", -1 )
+	if strings.HasSuffix(domain, c.Domain) == true && domain != c.Domain {
+		subdomain := strings.Replace(domain, "."+c.Domain, "", -1)
 		if subdomain != "*" && subdomain != "" {
 			return subdomain
 		}

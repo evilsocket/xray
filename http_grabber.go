@@ -108,7 +108,7 @@ func collectCertificates(certs []*x509.Certificate, t *Target) {
 			// Check for domains
 			if ctx != nil {
 				// Search in common name.
-				if sub := ctx.GetSubDomain( cert.Subject.CommonName ); sub != "" {
+				if sub := ctx.GetSubDomain(cert.Subject.CommonName); sub != "" {
 					ctx.Bruter.AddInput(sub)
 				}
 
@@ -140,7 +140,7 @@ func collectHTML(resp *http.Response, t *Target) {
 		data := string(raw_body)
 
 		// check if this is an Amazon bucket ... FUCK XML PARSERS!
-		if strings.Contains( data, "ListBucketResult" ) && strings.Contains( data, "<Name>" ) {
+		if strings.Contains(data, "ListBucketResult") && strings.Contains(data, "<Name>") {
 			re := regexp.MustCompile(".*<Name>([^<]+)</Name>.*")
 			match := re.FindStringSubmatch(data)
 			if len(match) > 0 {

@@ -3,6 +3,10 @@ SOURCE=cmd/$(NAME)/*.go
 GOBUILD=go build
 DEPEND=github.com/Masterminds/glide
 
+.PHONY: format
+format:
+	gofmt -s -w .
+
 # Command to get glide, you need to run it only once
 .PHONY: get_glide
 get_glide:
@@ -26,7 +30,7 @@ clean:
 	@rm -rf build
 
 .PHONY: static
-static:
+static: format
 	go-bindata -o cmd/xray/ui.go -pkg main ui
 
 # Building linux binaries

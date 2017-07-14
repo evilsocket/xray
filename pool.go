@@ -77,7 +77,7 @@ func (p *Pool) Add(t *Target) {
 func (p *Pool) Sorted() []string {
 	if len(p.addrs) == 0 {
 		p.addrs = make([]string, 0, len(p.Session.Targets))
-		for addr, _ := range p.Session.Targets {
+		for addr := range p.Session.Targets {
 			p.addrs = append(p.addrs, addr)
 		}
 		sort.Strings(p.addrs)
