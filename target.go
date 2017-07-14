@@ -28,6 +28,7 @@ package xray
 
 import (
 	"github.com/ns3777k/go-shodan/shodan"
+	"net"
 	"sort"
 	"sync"
 )
@@ -40,11 +41,12 @@ type HistoryEntry struct {
 }
 
 type Target struct {
-	Address string
-	Domains []string
-	Banners map[string]string
-	Info    *shodan.Host
-	History map[string][]HistoryEntry
+	Address   string
+	Hostnames []string
+	Domains   []string
+	Banners   map[string]string
+	Info      *shodan.Host
+	History   map[string][]HistoryEntry
 
 	ctx      *Context
 	grabbers []Grabber
@@ -53,13 +55,14 @@ type Target struct {
 
 func NewTarget(address string, domain string) *Target {
 	t := &Target{
-		Address:  address,
-		Domains:  []string{domain},
-		Banners:  make(map[string]string),
-		History:  make(map[string][]HistoryEntry),
-		Info:     nil,
-		grabbers: make([]Grabber, 0),
-		ctx:      GetContext(),
+		Address:   address,
+		Hostnames: make([]string, 0),
+		Domains:   []string{domain},
+		Banners:   make(map[string]string),
+		History:   make(map[string][]HistoryEntry),
+		Info:      nil,
+		grabbers:  make([]Grabber, 0),
+		ctx:       GetContext(),
 	}
 
 	t.grabbers = append(t.grabbers, &HTTPGrabber{})
@@ -114,6 +117,10 @@ func (t Target) scanDomainAsync(domain string) {
 
 func (t *Target) startAsyncScan() {
 	go func() {
+		if names, err := net.LookupAddr(t.Address); err == nil {
+			t.Hostnames = names
+		}
+
 		info, err := t.ctx.Shodan.GetServicesForHost(t.Address, &shodan.HostServicesOptions{
 			History: false,
 			Minify:  true,

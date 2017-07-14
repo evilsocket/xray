@@ -83,6 +83,9 @@
               <a href="https://www.shodan.io/host/{{ t.Address }}" target="_blank">
                 {{ t.Address }}
               </a>
+              <span ng-if="t.Hostnames.length > 0">
+                <small ng-repeat="h in t.Hostnames"><br/>{{ h + ($last ? '' : ', ') }}</small>
+              </span>
             </td>
             
             <td>
