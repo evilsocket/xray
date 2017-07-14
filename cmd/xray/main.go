@@ -38,7 +38,6 @@ import (
 	"github.com/evilsocket/xray"
 	"github.com/gin-gonic/contrib/static"
 	"github.com/gin-gonic/gin"
-	"github.com/ns3777k/go-shodan/shodan"
 )
 
 const version = "1.0.0b"
@@ -70,26 +69,21 @@ func OnResult(res interface{}) {
 			continue
 		}
 
-		t := pool.Find(address)
+		t := c.Pool.Find(address)
 		if t == nil {
-			pool.Add(xray.NewTarget(address, result.hostname, shapi, vdns))
-			pool.FlushSession(&bruter.Stats)
+			c.Pool.Add(xray.NewTarget(address, result.hostname))
+			c.Pool.FlushSession(&c.Bruter.Stats)
 		} else {
 			if t.AddDomain(result.hostname) == true {
-				pool.FlushSession(&bruter.Stats)
+				c.Pool.FlushSession(&c.Bruter.Stats)
 			}
 		}
 	}
 }
 
 var (
-	context *xray.Context
-	session *xray.Session
-	pool    *xray.Pool
-	shapi   *shodan.Client
-	vdns    *xray.ViewDNS
-	bruter  *xray.Machine
-	router  *gin.Engine
+	c      *xray.Context
+	router *gin.Engine
 
 	base        = flag.String("domain", "", "Base domain to start enumeration from.")
 	pres_dom    = flag.Bool("preserve-domain", false, "Do not remove subdomain from the provided domain name.")
@@ -131,19 +125,11 @@ func main() {
 
 	gin.SetMode(gin.ReleaseMode)
 
-	session = xray.NewSession(*sesfile)
-	pool = xray.NewPool(session)
-	shapi = shodan.NewClient(nil, *shodan_tok)
-	vdns = xray.NewViewDNS(*viewdns_tok)
-	bruter = xray.NewMachine(*consumers, *wordlist, session, DoRequest, OnResult)
+	c = xray.MakeContext(*base, *sesfile, *consumers, *wordlist, *shodan_tok, *viewdns_tok, DoRequest, OnResult)
 	router = gin.New()
 
-	context = xray.GetContext()
-	context.Domain = *base
-	context.Bruter = bruter
-
 	// Test Shodan API
-	info, err := shapi.GetAPIInfo()
+	info, err := c.Shodan.GetAPIInfo()
 	if *shodan_tok != "" && err != nil {
 		fmt.Println("Shodan Error:", err)
 		fmt.Println("Please fix error or remove `-shodan-key` flag")
@@ -155,20 +141,20 @@ func main() {
 
 	// Easy stuff, serve static assets and JSON "API"
 	router.Use(static.Serve("/", NewBFS("ui")))
-	router.GET("/targets", func(c *gin.Context) {
-		bruter.UpdateStats()
-		c.JSON(200, gin.H{
+	router.GET("/targets", func(g *gin.Context) {
+		c.Bruter.UpdateStats()
+		g.JSON(200, gin.H{
 			"domain":  *base,
-			"stats":   bruter.Stats,
-			"targets": session.Targets,
+			"stats":   c.Bruter.Stats,
+			"targets": c.Session.Targets,
 		})
 	})
 
 	// Let the user know where the session file is located.
-	if !pool.WasRestored() {
+	if !c.Pool.WasRestored() {
 		fmt.Printf("@ Saving session to %s\n", *sesfile)
 	} else {
-		fmt.Printf("@ Restoring DNS bruteforcing from %.2f%%\n", session.Stats.Progress)
+		fmt.Printf("@ Restoring DNS bruteforcing from %.2f%%\n", c.Session.Stats.Progress)
 	}
 
 	// Start web server in its own go routine.
@@ -183,21 +169,21 @@ func main() {
 	go func() {
 		ticker := time.NewTicker(time.Millisecond * 10000)
 		for range ticker.C {
-			bruter.UpdateStats()
-			pool.FlushSession(&bruter.Stats)
+			c.Bruter.UpdateStats()
+			c.Pool.FlushSession(&c.Bruter.Stats)
 
-			if bruter.Stats.Progress < 100.0 {
-				fmt.Printf("%.2f %% completed, %.2f req/s, %d unique targets found so far ...\n", bruter.Stats.Progress, bruter.Stats.Eps, len(session.Targets))
+			if c.Bruter.Stats.Progress < 100.0 {
+				fmt.Printf("%.2f %% completed, %.2f req/s, %d unique targets found so far ...\n", c.Bruter.Stats.Progress, c.Bruter.Stats.Eps, len(c.Session.Targets))
 			}
 		}
 	}()
 
 	// Start DNS bruteforcing.
-	if err := bruter.Start(); err != nil {
+	if err := c.Bruter.Start(); err != nil {
 		panic(err)
 	}
 
-	bruter.Wait()
+	c.Bruter.Wait()
 
 	fmt.Println("\nAll tasks completed, press Ctrl-C to quit.")
 

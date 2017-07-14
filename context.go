@@ -27,6 +27,7 @@
 package xray
 
 import (
+	"github.com/ns3777k/go-shodan/shodan"
 	"strings"
 	"sync"
 )
@@ -37,8 +38,27 @@ var (
 )
 
 type Context struct {
-	Domain string
-	Bruter *Machine
+	Domain  string
+	Bruter  *Machine
+	Session *Session
+	Pool    *Pool
+	Shodan  *shodan.Client
+	VDNS    *ViewDNS
+}
+
+func MakeContext(domain string, session_file string, consumers int, wordlist string, shodan_token string, viewdns_token string, run_handler RunHandler, res_handler ResultHandler) *Context {
+	lock.Lock()
+	defer lock.Unlock()
+
+	instance = &Context{}
+	instance.Domain = domain
+	instance.Session = NewSession(session_file)
+	instance.Pool = NewPool(instance.Session)
+	instance.Bruter = NewMachine(consumers, wordlist, instance.Session, run_handler, res_handler)
+	instance.Shodan = shodan.NewClient(nil, shodan_token)
+	instance.VDNS = NewViewDNS(viewdns_token)
+
+	return instance
 }
 
 func GetContext() *Context {

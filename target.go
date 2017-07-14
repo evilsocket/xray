@@ -46,12 +46,12 @@ type Target struct {
 	Info    *shodan.Host
 	History map[string][]HistoryEntry
 
-	vdns     *ViewDNS
+	ctx      *Context
 	grabbers []Grabber
 	lock     sync.Mutex
 }
 
-func NewTarget(address string, domain string, sh *shodan.Client, vdns *ViewDNS) *Target {
+func NewTarget(address string, domain string) *Target {
 	t := &Target{
 		Address:  address,
 		Domains:  []string{domain},
@@ -59,7 +59,7 @@ func NewTarget(address string, domain string, sh *shodan.Client, vdns *ViewDNS) 
 		History:  make(map[string][]HistoryEntry),
 		Info:     nil,
 		grabbers: make([]Grabber, 0),
-		vdns:     vdns,
+		ctx:      GetContext(),
 	}
 
 	t.grabbers = append(t.grabbers, &HTTPGrabber{})
@@ -72,7 +72,7 @@ func NewTarget(address string, domain string, sh *shodan.Client, vdns *ViewDNS) 
 	t.grabbers = append(t.grabbers, NewLineGrabber("irc", []int{6667}))
 
 	t.scanDomainAsync(domain)
-	t.startAsyncScan(sh)
+	t.startAsyncScan()
 	return t
 }
 
@@ -108,14 +108,16 @@ func (t Target) scanDomainAsync(domain string) {
 	go func(t *Target, domain string) {
 		t.lock.Lock()
 		defer t.lock.Unlock()
-		t.History[domain] = t.vdns.GetHistory(domain)
+		t.History[domain] = t.ctx.VDNS.GetHistory(domain)
 	}(&t, domain)
 }
 
-func (t *Target) startAsyncScan(sh *shodan.Client) {
+func (t *Target) startAsyncScan() {
 	go func() {
-		opts := shodan.HostServicesOptions{History: false, Minify: true}
-		info, err := sh.GetServicesForHost(t.Address, &opts)
+		info, err := t.ctx.Shodan.GetServicesForHost(t.Address, &shodan.HostServicesOptions{
+			History: false,
+			Minify:  true,
+		})
 		if err == nil {
 			t.Info = info
 			go t.startAsyncBannerGrabbing()
