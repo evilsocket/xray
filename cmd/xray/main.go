@@ -83,6 +83,7 @@ func OnResult(res interface{}) {
 }
 
 var (
+	context *xray.Context
 	session *xray.Session
 	pool    *xray.Pool
 	shapi   *shodan.Client
@@ -136,6 +137,10 @@ func main() {
 	vdns = xray.NewViewDNS(*viewdns_tok)
 	bruter = xray.NewMachine(*consumers, *wordlist, session, DoRequest, OnResult)
 	router = gin.New()
+
+	context = xray.GetContext()
+	context.Domain = *base
+	context.Bruter = bruter
 
 	// Test Shodan API
 	info, err := shapi.GetAPIInfo()

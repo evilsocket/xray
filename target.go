@@ -126,12 +126,9 @@ func (t *Target) startAsyncScan(sh *shodan.Client) {
 func (t *Target) startAsyncBannerGrabbing() {
 	go func() {
 		if t.Info != nil {
-			t.Banners["grabbing"] = ""
-
 			for _, port := range t.Info.Ports {
 				for _, grabber := range t.grabbers {
 					grabber.Grab(port, t)
-					delete(t.Banners, "grabbing")
 				}
 			}
 		}

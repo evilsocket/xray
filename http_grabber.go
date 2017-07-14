@@ -100,8 +100,32 @@ func Subject2String(s pkix.Name) string {
 
 func collectCertificates(certs []*x509.Certificate, t *Target) {
 	if certs != nil && len(certs) > 0 {
+		ctx := GetContext()
+
 		for i, cert := range certs {
 			t.Banners[fmt.Sprintf("https:chain[%d]", i)] = Subject2String(cert.Subject)
+
+			// Check for domains
+			if ctx != nil {
+				// Search in common name.
+				if strings.HasSuffix( cert.Subject.CommonName, ctx.Domain ) == true && cert.Subject.CommonName != ctx.Domain {
+					subdomain := strings.Replace( cert.Subject.CommonName, "." + ctx.Domain, "", -1 )
+					if subdomain != "*" && subdomain != "" {
+						fmt.Printf( "CommonName: %s (%s)\n", cert.Subject.CommonName, subdomain )
+						ctx.Bruter.AddInput(subdomain)
+					}
+				}
+				
+				// Search in alternative names.
+				for _, name := range cert.DNSNames {
+					if strings.HasSuffix( name, ctx.Domain ) == true && name != ctx.Domain {
+						subdomain := strings.Replace( name, "." + ctx.Domain, "", -1 )
+						if subdomain != "*" && subdomain != "" {
+							ctx.Bruter.AddInput(subdomain)
+						}
+					}
+				}
+			}
 		}
 	}
 }

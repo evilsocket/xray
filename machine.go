@@ -126,6 +126,11 @@ func (m *Machine) outputConsumer() {
 	}
 }
 
+func (m *Machine) AddInput(input string) {
+	m.wait.Add(1)
+	m.input <- input
+}
+
 // Start the machine.
 func (m *Machine) Start() error {
 	// start a fixed amount of consumers for inputs
@@ -165,8 +170,7 @@ func (m *Machine) Start() error {
 	}
 
 	for line := range lines {
-		m.wait.Add(1)
-		m.input <- line
+		m.AddInput(line)
 	}
 
 	return nil
