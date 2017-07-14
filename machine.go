@@ -143,15 +143,20 @@ func (m *Machine) Start() error {
 
 	// count the inputs we have
 	m.Stats.Inputs = 0
-	lines, err := LineReader(m.filename, 0)
-	if err != nil {
-		return err
-	}
-	for range lines {
-		m.Stats.Inputs++
-	}
 
-	lines, err = LineReader(m.filename, 0)
+	go func(m *Machine) {
+		var n = uint64(0)
+		if lines, err := LineReader(m.filename, 0); err == nil {
+			for range lines {
+				n++
+			}
+		}
+
+		// this way, Inputs will go from 0 directly to N
+		atomic.AddUint64(&m.Stats.Inputs, n)
+	}(m)
+
+	lines, err := LineReader(m.filename, 0)
 	if err != nil {
 		return err
 	}
