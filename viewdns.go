@@ -60,6 +60,12 @@ func (d *ViewDNS) GetHistory(domain string) []HistoryEntry {
 
 	if d.apikey != "" {
 		if res, err := http.Get(url); err == nil {
+			/*empijei: error not handled,
+			suggestion to either handle it or throw it away properly, i.e.:
+			defer func(){
+				_ = res.Body.Close()
+			}
+			*/
 			defer res.Body.Close()
 
 			decoder := json.NewDecoder(res.Body)

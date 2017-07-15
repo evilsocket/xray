@@ -27,10 +27,11 @@
 package xray
 
 import (
-	"github.com/ns3777k/go-shodan/shodan"
 	"net"
 	"sort"
 	"sync"
+
+	"github.com/ns3777k/go-shodan/shodan"
 )
 
 type HistoryEntry struct {
@@ -48,7 +49,8 @@ type Target struct {
 	Info      *shodan.Host
 	History   map[string][]HistoryEntry
 
-	ctx  *Context
+	ctx *Context
+	//empijei: I suggest composing Context with a mutex and removing this instance variable
 	lock sync.Mutex
 }
 

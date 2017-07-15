@@ -24,19 +24,16 @@
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  */
-package xray
+package grabbers
 
 import (
 	"bufio"
 	"fmt"
 	"net"
 	"strings"
-)
 
-type Grabber interface {
-	Name() string
-	Grab(port int, t *Target)
-}
+	xray "github.com/empijei/xray"
+)
 
 type LineGrabber struct {
 	name  string
@@ -63,9 +60,15 @@ func (g *LineGrabber) CheckPort(port int) bool {
 	return false
 }
 
-func (g *LineGrabber) Grab(port int, t *Target) {
+func (g *LineGrabber) Grab(port int, t *xray.Target) {
 	if g.CheckPort(port) {
 		if conn, err := net.Dial("tcp", fmt.Sprintf("%s:%d", t.Address, port)); err == nil {
+			/*empijei: error not handled,
+			suggestion to either handle it or throw it away properly, i.e.:
+			defer func(){
+				_ = conn.Close()
+			}
+			*/
 			defer conn.Close()
 			msg, _ := bufio.NewReader(conn).ReadString('\n')
 			t.Banners[g.Name()] = strings.Trim(msg, "\r\n\t ")

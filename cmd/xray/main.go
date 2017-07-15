@@ -35,7 +35,7 @@ import (
 	"time"
 
 	"github.com/bobesa/go-domain-util/domainutil"
-	"github.com/evilsocket/xray"
+	"github.com/empijei/xray"
 	"github.com/gin-gonic/contrib/static"
 	"github.com/gin-gonic/gin"
 )

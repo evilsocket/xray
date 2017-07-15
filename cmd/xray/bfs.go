@@ -27,9 +27,12 @@
 package main
 
 import (
-	assetfs "github.com/elazarl/go-bindata-assetfs"
+	//empijei: I suggest using rice (https://github.com/GeertJohan/go.rice)
+	//instead as it is mantained and more versatile
 	"net/http"
 	"strings"
+
+	assetfs "github.com/elazarl/go-bindata-assetfs"
 )
 
 type BFS struct {

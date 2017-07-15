@@ -71,6 +71,10 @@ func NewSession(filename string) *Session {
 func (s *Session) Flush(stats *Statistics) {
 	s.Stats = stats
 	if data, err := json.Marshal(s); err == nil {
+		/*empijei: error not handled,
+		suggestion to either handle it or throw it away properly, i.e.:
+			_ = ioutil.WriteFile(s.filename, data, 0644)
+		*/
 		ioutil.WriteFile(s.filename, data, 0644)
 	} else {
 		panic(err)

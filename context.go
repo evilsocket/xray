@@ -27,24 +27,22 @@
 package xray
 
 import (
-	"github.com/ns3777k/go-shodan/shodan"
 	"strings"
 	"sync"
+
+	"github.com/ns3777k/go-shodan/shodan"
 )
 
 var (
 	instance *Context = nil
 	lock     sync.Mutex
-	Grabbers = [...]Grabber{
-		&HTTPGrabber{},
-		&DNSGrabber{},
-		NewLineGrabber("smtp", []int{25, 587}),
-		NewLineGrabber("ftp", []int{21}),
-		NewLineGrabber("ssh", []int{22, 222, 2222}),
-		NewLineGrabber("pop", []int{110}),
-		NewLineGrabber("irc", []int{6667}),
-	}
+	Grabbers []Grabber
 )
+
+type Grabber interface {
+	Name() string
+	Grab(port int, t *Target)
+}
 
 type Context struct {
 	Domain  string
@@ -68,6 +66,10 @@ func MakeContext(domain string, session_file string, consumers int, wordlist str
 	instance.VDNS = NewViewDNS(viewdns_token)
 
 	return instance
+}
+
+func SetupGrabbers(gs []Grabber) {
+	Grabbers = gs
 }
 
 func GetContext() *Context {

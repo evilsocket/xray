@@ -24,12 +24,14 @@
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  */
-package xray
+package grabbers
 
 import (
 	"fmt"
-	"github.com/miekg/dns"
 	"regexp"
+
+	xray "github.com/empijei/xray"
+	"github.com/miekg/dns"
 )
 
 type DNSGrabber struct {
@@ -57,7 +59,7 @@ func (g *DNSGrabber) grabChaos(addr string, q string) string {
 	return ""
 }
 
-func (g *DNSGrabber) Grab(port int, t *Target) {
+func (g *DNSGrabber) Grab(port int, t *xray.Target) {
 	if port != 53 {
 		return
 	}
