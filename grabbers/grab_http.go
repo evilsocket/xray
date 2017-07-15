@@ -24,19 +24,22 @@
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  */
-package xray
+package grabbers
 
 import (
 	"crypto/tls"
 	"crypto/x509"
 	"crypto/x509/pkix"
 	"fmt"
-	"golang.org/x/net/html"
 	"io/ioutil"
 	"net"
 	"net/http"
 	"regexp"
 	"strings"
+
+	xray "github.com/evilsocket/xray"
+
+	"golang.org/x/net/html"
 )
 
 type Dialer func(network, addr string) (net.Conn, error)
@@ -98,9 +101,9 @@ func Subject2String(s pkix.Name) string {
 		s.CommonName)
 }
 
-func collectCertificates(certs []*x509.Certificate, t *Target) {
+func collectCertificates(certs []*x509.Certificate, t *xray.Target) {
 	if certs != nil && len(certs) > 0 {
-		ctx := GetContext()
+		ctx := xray.GetContext()
 
 		for i, cert := range certs {
 			t.Banners[fmt.Sprintf("https:chain[%d]", i)] = Subject2String(cert.Subject)
@@ -123,7 +126,7 @@ func collectCertificates(certs []*x509.Certificate, t *Target) {
 	}
 }
 
-func collectHeaders(resp *http.Response, t *Target) {
+func collectHeaders(resp *http.Response, t *xray.Target) {
 	for name, value := range resp.Header {
 		if name == "Server" {
 			t.Banners["http:server"] = strings.Trim(value[0], "\r\n\t ")
@@ -135,7 +138,7 @@ func collectHeaders(resp *http.Response, t *Target) {
 	}
 }
 
-func collectHTML(resp *http.Response, t *Target) {
+func collectHTML(resp *http.Response, t *xray.Target) {
 	if raw_body, err := ioutil.ReadAll(resp.Body); err == nil {
 		data := string(raw_body)
 
@@ -158,11 +161,17 @@ func collectHTML(resp *http.Response, t *Target) {
 	}
 }
 
-func collectRobots(client *http.Client, url string, t *Target) {
+func collectRobots(client *http.Client, url string, t *xray.Target) {
 	rob, err := client.Get(url + "robots.txt")
 	if err != nil {
 		return
 	}
+	/*empijei: error not handled,
+	suggestion to either handle it or throw it away properly, i.e.:
+	defer func(){
+		_ = rob.Body.Close()
+	}
+	*/
 	defer rob.Body.Close()
 
 	if rob.StatusCode != 200 {
@@ -196,7 +205,7 @@ func collectRobots(client *http.Client, url string, t *Target) {
 	}
 }
 
-func (g *HTTPGrabber) Grab(port int, t *Target) {
+func (g *HTTPGrabber) Grab(port int, t *xray.Target) {
 	if port != 80 && port != 8080 && port != 443 && port != 8433 {
 		return
 	}
@@ -228,6 +237,12 @@ func (g *HTTPGrabber) Grab(port int, t *Target) {
 
 	resp, err := client.Get(url)
 	if err == nil {
+		/*empijei: error not handled,
+		suggestion to either handle it or throw it away properly, i.e.:
+		defer func(){
+			_ = resp.Body.Close()
+		}
+		*/
 		defer resp.Body.Close()
 
 		collectCertificates(certificates, t)

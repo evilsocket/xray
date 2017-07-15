@@ -42,6 +42,12 @@ func LineReader(filename string) (chan string, error) {
 
 	out := make(chan string)
 	go func() {
+		/*empijei: error not handled,
+		suggestion to either handle it or throw it away properly, i.e.:
+		defer func(){
+			_ = fp.Close()
+		}
+		*/
 		defer fp.Close()
 		// we need to close the out channel in order
 		// to signal the end-of-data condition

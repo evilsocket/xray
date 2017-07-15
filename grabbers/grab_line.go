@@ -24,37 +24,54 @@
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  */
-package xray
+package grabbers
 
 import (
 	"bufio"
 	"fmt"
 	"net"
-	"regexp"
+	"strings"
+
+	xray "github.com/evilsocket/xray"
 )
 
-type MYSQLGrabber struct {
+type LineGrabber struct {
+	name  string
+	ports []int
 }
 
-func (g *MYSQLGrabber) Name() string {
-	return "mysql"
-}
-
-func (g *MYSQLGrabber) Grab(port int, t *Target) {
-	if port != 3306 {
-		return
+func NewLineGrabber(name string, ports []int) *LineGrabber {
+	return &LineGrabber{
+		name:  name,
+		ports: ports,
 	}
+}
 
-	if conn, err := net.Dial("tcp", fmt.Sprintf("%s:%d", t.Address, port)); err == nil {
-		defer conn.Close()
-		buf := make([]byte, 1024)
-		if read, err := bufio.NewReader(conn).Read(buf); err == nil && read > 0 {
-			s := string(buf[0:read])
-			re := regexp.MustCompile(".+\x0a([^\x00]+)\x00.+")
-			match := re.FindStringSubmatch(s)
-			if len(match) > 0 {
-				t.Banners[g.Name()] = match[1]
+func (g *LineGrabber) Name() string {
+	return g.name
+}
+
+func (g *LineGrabber) CheckPort(port int) bool {
+	for _, p := range g.ports {
+		if p == port {
+			return true
+		}
+	}
+	return false
+}
+
+func (g *LineGrabber) Grab(port int, t *xray.Target) {
+	if g.CheckPort(port) {
+		if conn, err := net.Dial("tcp", fmt.Sprintf("%s:%d", t.Address, port)); err == nil {
+			/*empijei: error not handled,
+			suggestion to either handle it or throw it away properly, i.e.:
+			defer func(){
+				_ = conn.Close()
 			}
+			*/
+			defer conn.Close()
+			msg, _ := bufio.NewReader(conn).ReadString('\n')
+			t.Banners[g.Name()] = strings.Trim(msg, "\r\n\t ")
 		}
 	}
 }

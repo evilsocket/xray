@@ -24,51 +24,45 @@
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  */
-package xray
+package grabbers
 
 import (
+	"bufio"
 	"fmt"
-	"github.com/miekg/dns"
+	"net"
 	"regexp"
+
+	xray "github.com/evilsocket/xray"
 )
 
-type DNSGrabber struct {
+type MYSQLGrabber struct {
 }
 
-func (g *DNSGrabber) Name() string {
-	return "dns"
+func (g *MYSQLGrabber) Name() string {
+	return "mysql"
 }
 
-func (g *DNSGrabber) grabChaos(addr string, q string) string {
-	c := new(dns.Client)
-	m := new(dns.Msg)
-	m.Question = make([]dns.Question, 1)
-	m.Question[0] = dns.Question{q, dns.TypeTXT, dns.ClassCHAOS}
-
-	in, _, _ := c.Exchange(m, addr)
-	if in != nil && len(in.Answer) > 0 {
-		s := in.Answer[0].String()
-		re := regexp.MustCompile(".*\"([^\"]+)\".*")
-		match := re.FindStringSubmatch(s)
-		if len(match) > 0 {
-			return match[1]
-		}
-	}
-	return ""
-}
-
-func (g *DNSGrabber) Grab(port int, t *Target) {
-	if port != 53 {
+func (g *MYSQLGrabber) Grab(port int, t *xray.Target) {
+	if port != 3306 {
 		return
 	}
 
-	addr := fmt.Sprintf("%s:53", t.Address)
-
-	if v := g.grabChaos(addr, "version.bind."); v != "" {
-		t.Banners["dns:version"] = v
-	}
-
-	if h := g.grabChaos(addr, "hostname.bind."); h != "" {
-		t.Banners["dns:hostname"] = h
+	if conn, err := net.Dial("tcp", fmt.Sprintf("%s:%d", t.Address, port)); err == nil {
+		/*empijei: error not handled,
+		suggestion to either handle it or throw it away properly, i.e.:
+		defer func(){
+			_ = conn.Close()
+		}
+		*/
+		defer conn.Close()
+		buf := make([]byte, 1024)
+		if read, err := bufio.NewReader(conn).Read(buf); err == nil && read > 0 {
+			s := string(buf[0:read])
+			re := regexp.MustCompile(".+\x0a([^\x00]+)\x00.+")
+			match := re.FindStringSubmatch(s)
+			if len(match) > 0 {
+				t.Banners[g.Name()] = match[1]
+			}
+		}
 	}
 }
