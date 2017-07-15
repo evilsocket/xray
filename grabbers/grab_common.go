@@ -2,7 +2,7 @@ package grabbers
 
 import xray "github.com/evilsocket/xray"
 
-func init() {
+func Init() {
 	xray.SetupGrabbers(
 		[]xray.Grabber{
 			&HTTPGrabber{},

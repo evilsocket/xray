@@ -34,8 +34,10 @@ import (
 	"strings"
 	"time"
 
-	"github.com/bobesa/go-domain-util/domainutil"
 	"github.com/evilsocket/xray"
+	"github.com/evilsocket/xray/grabbers"
+
+	"github.com/bobesa/go-domain-util/domainutil"
 	"github.com/gin-gonic/contrib/static"
 	"github.com/gin-gonic/gin"
 )
@@ -124,6 +126,8 @@ func main() {
 	}
 
 	gin.SetMode(gin.ReleaseMode)
+
+	grabbers.Init()
 
 	c = xray.MakeContext(*base, *sesfile, *consumers, *wordlist, *shodan_tok, *viewdns_tok, DoRequest, OnResult)
 	router = gin.New()
