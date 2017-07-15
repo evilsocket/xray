@@ -146,7 +146,7 @@ func (m *Machine) Start() error {
 
 	go func(m *Machine) {
 		var n = uint64(0)
-		if lines, err := LineReader(m.filename, 0); err == nil {
+		if lines, err := LineReader(m.filename); err == nil {
 			for range lines {
 				n++
 			}
@@ -156,7 +156,7 @@ func (m *Machine) Start() error {
 		atomic.AddUint64(&m.Stats.Inputs, n)
 	}(m)
 
-	lines, err := LineReader(m.filename, 0)
+	lines, err := LineReader(m.filename)
 	if err != nil {
 		return err
 	}
