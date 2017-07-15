@@ -30,7 +30,7 @@ import (
 	"fmt"
 	"regexp"
 
-	xray "github.com/empijei/xray"
+	"github.com/evilsocket/xray"
 	"github.com/miekg/dns"
 )
 

@@ -50,7 +50,8 @@ type Target struct {
 	History   map[string][]HistoryEntry
 
 	ctx *Context
-	//empijei: I suggest composing Context with a mutex and removing this instance variable
+	//empijei: I suggest composing Context with a mutex and removing this
+	//instance variable see "Embedding" in "Effective Go"
 	lock sync.Mutex
 }
 

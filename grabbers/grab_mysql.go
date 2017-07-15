@@ -32,7 +32,7 @@ import (
 	"net"
 	"regexp"
 
-	xray "github.com/empijei/xray"
+	xray "github.com/evilsocket/xray"
 )
 
 type MYSQLGrabber struct {

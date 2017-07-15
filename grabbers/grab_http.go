@@ -37,7 +37,7 @@ import (
 	"regexp"
 	"strings"
 
-	xray "github.com/empijei/xray"
+	xray "github.com/evilsocket/xray"
 
 	"golang.org/x/net/html"
 )

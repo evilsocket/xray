@@ -32,7 +32,7 @@ import (
 	"net"
 	"strings"
 
-	xray "github.com/empijei/xray"
+	xray "github.com/evilsocket/xray"
 )
 
 type LineGrabber struct {
