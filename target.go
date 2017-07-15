@@ -33,16 +33,6 @@ import (
 	"sync"
 )
 
-var Grabbers = [...]Grabber{
-	&HTTPGrabber{},
-	&DNSGrabber{},
-	NewLineGrabber("smtp", []int{25, 587}),
-	NewLineGrabber("ftp", []int{21}),
-	NewLineGrabber("ssh", []int{22, 222, 2222}),
-	NewLineGrabber("pop", []int{110}),
-	NewLineGrabber("irc", []int{6667}),
-}
-
 type HistoryEntry struct {
 	Address  string `json:"ip"`
 	Location string `json:"location"`
@@ -126,19 +116,7 @@ func (t *Target) startAsyncScan() {
 		})
 		if err == nil {
 			t.Info = info
-			go t.startAsyncBannerGrabbing()
-		}
-	}()
-}
-
-func (t *Target) startAsyncBannerGrabbing() {
-	go func() {
-		if t.Info != nil {
-			for _, port := range t.Info.Ports {
-				for _, grabber := range Grabbers {
-					grabber.Grab(port, t)
-				}
-			}
+			t.ctx.StartGrabbing(t)
 		}
 	}()
 }

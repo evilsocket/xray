@@ -35,6 +35,15 @@ import (
 var (
 	instance *Context = nil
 	lock     sync.Mutex
+	Grabbers = [...]Grabber{
+		&HTTPGrabber{},
+		&DNSGrabber{},
+		NewLineGrabber("smtp", []int{25, 587}),
+		NewLineGrabber("ftp", []int{21}),
+		NewLineGrabber("ssh", []int{22, 222, 2222}),
+		NewLineGrabber("pop", []int{110}),
+		NewLineGrabber("irc", []int{6667}),
+	}
 )
 
 type Context struct {
@@ -82,4 +91,16 @@ func (c *Context) GetSubDomain(domain string) string {
 		}
 	}
 	return ""
+}
+
+func (c *Context) StartGrabbing(t *Target) {
+	go func() {
+		if t.Info != nil {
+			for _, port := range t.Info.Ports {
+				for _, grabber := range Grabbers {
+					grabber.Grab(port, t)
+				}
+			}
+		}
+	}()
 }
