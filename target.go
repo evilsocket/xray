@@ -33,6 +33,16 @@ import (
 	"sync"
 )
 
+var Grabbers = [...]Grabber{
+	&HTTPGrabber{},
+	&DNSGrabber{},
+	NewLineGrabber("smtp", []int{25, 587}),
+	NewLineGrabber("ftp", []int{21}),
+	NewLineGrabber("ssh", []int{22, 222, 2222}),
+	NewLineGrabber("pop", []int{110}),
+	NewLineGrabber("irc", []int{6667}),
+}
+
 type HistoryEntry struct {
 	Address  string `json:"ip"`
 	Location string `json:"location"`
@@ -48,9 +58,8 @@ type Target struct {
 	Info      *shodan.Host
 	History   map[string][]HistoryEntry
 
-	ctx      *Context
-	grabbers []Grabber
-	lock     sync.Mutex
+	ctx  *Context
+	lock sync.Mutex
 }
 
 func NewTarget(address string, domain string) *Target {
@@ -61,18 +70,8 @@ func NewTarget(address string, domain string) *Target {
 		Banners:   make(map[string]string),
 		History:   make(map[string][]HistoryEntry),
 		Info:      nil,
-		grabbers:  make([]Grabber, 0),
 		ctx:       GetContext(),
 	}
-
-	t.grabbers = append(t.grabbers, &HTTPGrabber{})
-	t.grabbers = append(t.grabbers, &DNSGrabber{})
-	t.grabbers = append(t.grabbers, &MYSQLGrabber{})
-	t.grabbers = append(t.grabbers, NewLineGrabber("smtp", []int{25, 587}))
-	t.grabbers = append(t.grabbers, NewLineGrabber("ftp", []int{21}))
-	t.grabbers = append(t.grabbers, NewLineGrabber("ssh", []int{22, 222, 2222}))
-	t.grabbers = append(t.grabbers, NewLineGrabber("pop", []int{110}))
-	t.grabbers = append(t.grabbers, NewLineGrabber("irc", []int{6667}))
 
 	t.scanDomainAsync(domain)
 	t.startAsyncScan()
@@ -136,7 +135,7 @@ func (t *Target) startAsyncBannerGrabbing() {
 	go func() {
 		if t.Info != nil {
 			for _, port := range t.Info.Ports {
-				for _, grabber := range t.grabbers {
+				for _, grabber := range Grabbers {
 					grabber.Grab(port, t)
 				}
 			}
