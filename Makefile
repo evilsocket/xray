@@ -2,10 +2,11 @@ NAME=xray
 SOURCE=cmd/$(NAME)/*.go
 GOBUILD=go build
 DEPEND=github.com/Masterminds/glide
+GOFILES=$(shell find . -type f -name '*.go' -not -path "./vendor/*")
 
 .PHONY: format
 format:
-	gofmt -s -w .
+	@gofmt -s -w $(GOFILES)
 
 # Command to get glide, you need to run it only once
 .PHONY: get_glide
