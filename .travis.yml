@@ -1,6 +1,8 @@
 language: go
 
-go: master
+go:
+  - 1.7
+  - master
 
 install:
   - make get_glide
