@@ -1,0 +1,9 @@
+language: go
+
+go: master
+
+install:
+  - make get_glide
+  - make install_dependencies
+
+script: make build
