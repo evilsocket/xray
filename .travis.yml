@@ -7,5 +7,6 @@ go:
 install:
   - make get_glide
   - make install_dependencies
+  - go get -u github.com/jteeuwen/go-bindata/...
 
 script: make build
