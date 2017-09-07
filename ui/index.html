@@ -5,9 +5,13 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>XRAY</title>
+
     <link rel="stylesheet" href="/bootstrap.min.css">
+    <script src="/jquery.min.js"></script>
+    <script src="/bootstrap.min.js"></script>
     <script src="/angular.min.js"></script>
     <script src="/index.js"></script>
+
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css">
 <style>
 .borderless {
@@ -17,18 +21,6 @@
 .borderless td, .borderless th {
   padding: 2px !important;
   border: none !important;
-}
-
-.sortorder {
-  cursor: pointer;
-}
-
-.sortorder:after {
-  content: '\25b2';   // UP-POINTING TRIANGLE
-}
-
-.sortorder.reverse:after {
-  content: '\25bc';   // DOWN-POINTING TRIANGLE
 }
 </style>
   </head>
@@ -64,31 +56,29 @@
         <tr>
           <td colspan="2">
             <div class="input-group" style="width:100%">
-              <label class="btn btn-default input-group-addon">
-                <input type="checkbox" ng-model="showEmpty" autocomplete="off" ng-true-value="null" ng-false-value="''" checked> Empty Rows
+              <label class="btn btn-default input-group-addon" id="basic-addon3">
+                <input type="checkbox" id="show_empty" autocomplete="off" checked> Empty Rows
               </label>
-              <input type="text" class="form-control" ng-model="searchText" placeholder="Search ..." aria-describedby="basic-addon3">
-              <label class="btn btn-default input-group-addon" ng-click="reset()">
-                <i class="fa fa-times" aria-hidden="true"></i>
-              </label>
+              <input type="text" class="form-control" id="search" placeholder="Search ..." aria-describedby="basic-addon3">
             </div>
+
           </td>
-        </tr>
+        </tr> 
       </table>
 
       <table class="table table-striped">
         <thead>
           <tr>
-            <th width="8%" class="sortorder" ng-click="sortBy('Address')" ng-class="{reverse: reverse}">Address</th>
+            <th width="8%">Address</th>
             <th>Domains</th>
             <th width="10%">Ports</th>
             <th width="45%">Info</th>
-            <th ng-click="sortBy('Info.isp')" class="sortorder" ng-class="{reverse: reverse}">ISP</th>
-            <th ng-click="sortBy('Info.country_name')" class="sortorder" ng-class="{reverse: reverse}">Country</th>
+            <th>ISP</th>
+            <th>Country</th>
           </tr>
         </thead>
         <tbody>
-          <tr ng-repeat="t in targets | toArray | orderBy: order:reverse | filter: searchText | filter: { Info: showEmpty }">
+          <tr ng-repeat="t in targets">
             <td>
               <a href="https://www.shodan.io/host/{{ t.Address }}" target="_blank">
                 {{ t.Address }}
@@ -97,50 +87,48 @@
                 <small ng-repeat="h in t.Hostnames"><br/>{{ h + ($last ? '' : ', ') }}</small>
               </span>
             </td>
-
+            
             <td>
               <span ng-repeat="domain in t.Domains">
                 {{ domain + ($last ? '' : ', ') }}
                 <span ng-if="t.History[domain].length > 0">
-
-                  <a class="htoggle" ng-click="t.ShowHistory = !t.ShowHistory">
+                  <a href="#table_{{ ( t.Address + domain ) | toid }}" class="htoggle">
                     <i class="fa fa-history" aria-hidden="true"></i>
                   </a>
 
-                  <div ng-show="t.ShowHistory">
+                  <div id="table_{{ ( t.Address + domain ) | toid }}" style="display:none">
                     <br/>
                     Domain History
                     <table class="table table-striped">
                       <tr ng-repeat="h in t.History[domain]">
-                        <td>{{ h.ip }}</td>
-                        <td>{{ h.location }}</td>
-                        <td>{{ h.owner }}</td>
-                        <td>{{ h.lastseen }}</td>
+                        <td>{{ h.ip }}</td> 
+                        <td>{{ h.location }}</td> 
+                        <td>{{ h.owner }}</td> 
+                        <td>{{ h.lastseen }}</td> 
                       </tr>
                     </table>
                   </div>
-
                 </span>
-              </span>
+              </span> 
             </td>
 
             <td>
-              <span ng-repeat="port in t.Info.ports">{{ port + ($last ? '' : ', ') }}</span>
+              <span ng-repeat="port in t.Info.ports">{{ port + ($last ? '' : ', ') }}</span> 
             </td>
-
+          
             <td>
-
+          
               <table class="table borderless">
                 <tr ng-repeat="(name,value) in t.Banners">
                   <td width="5%"><b>{{ name }}</b></td>
                   <td>{{ value }}</td>
                 </tr>
               </table>
-
+          
             </td>
-
+            
             <td>{{ t.Info.isp }}</td>
-
+            
             <td>{{ t.Info.country_name }}</td>
           </tr>
         </tbody>
@@ -152,10 +140,9 @@
       <center>
         <small>
           <a href="https://github.com/evilsocket/xray">XRAY</a> was made with <span style="color:red">♥</span> by
-        <a href="https://www.evilsocket.net/" target="_blank" >Simone 'evilsocket' Margaritelli</a>
+        <a href="https://www.evilsocket.net/" target="_blank" >Simone 'evilsocket' Margaritelli</a> 
         </small>
       </center>
     </footer>
-
   </body>
 </html>

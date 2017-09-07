@@ -51,6 +51,7 @@ type Context struct {
 	Pool    *Pool
 	Shodan  *shodan.Client
 	VDNS    *ViewDNS
+	CSH     *CertSH
 }
 
 func MakeContext(domain string, session_file string, consumers int, wordlist string, shodan_token string, viewdns_token string, run_handler RunHandler, res_handler ResultHandler) *Context {
@@ -64,6 +65,7 @@ func MakeContext(domain string, session_file string, consumers int, wordlist str
 	instance.Bruter = NewMachine(consumers, wordlist, instance.Session, run_handler, res_handler)
 	instance.Shodan = shodan.NewClient(nil, shodan_token)
 	instance.VDNS = NewViewDNS(viewdns_token)
+	instance.CSH = NewCertSH()
 
 	return instance
 }

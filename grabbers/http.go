@@ -166,12 +166,7 @@ func collectRobots(client *http.Client, url string, t *xray.Target) {
 	if err != nil {
 		return
 	}
-	/*empijei: error not handled,
-	suggestion to either handle it or throw it away properly, i.e.:
-	defer func(){
-		_ = rob.Body.Close()
-	}
-	*/
+
 	defer rob.Body.Close()
 
 	if rob.StatusCode != 200 {
@@ -237,12 +232,6 @@ func (g *HTTPGrabber) Grab(port int, t *xray.Target) {
 
 	resp, err := client.Get(url)
 	if err == nil {
-		/*empijei: error not handled,
-		suggestion to either handle it or throw it away properly, i.e.:
-		defer func(){
-			_ = resp.Body.Close()
-		}
-		*/
 		defer resp.Body.Close()
 
 		collectCertificates(certificates, t)

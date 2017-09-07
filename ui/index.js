@@ -28,93 +28,91 @@ var app = angular.module('XRAY', [], function($interpolateProvider) {
 
 });
 
-// Convert object into array of objects
-app.filter('toArray', function () {
-  return function (obj, addKey) {
-    if (!angular.isObject(obj)) return obj;
-    if ( addKey === false ) {
-      return Object.keys(obj).map(function(key) {
-        return obj[key];
-      });
-    } else {
-      return Object.keys(obj).map(function (key) {
-        var value = obj[key];
-        return angular.isObject(value) ?
-          Object.defineProperty(value, '$key', { enumerable: false, value: key}) :
-          { $key: key, $value: value };
-      });
+app.filter('toid', function() {
+    return function(domain) {
+       return domain.replace( /[^a-z0-9_]/g, '_' )
     }
-  };
 });
 
-// Main controller
-app.controller('XRayController', ['$scope', '$http', function (scope, http) {
+app.controller('XRayController', ['$scope', function (scope) {
+    scope.domain = "";
+    scope.stats = {
+        Start: "",
+        Stop: "",
+        Total: 0,
+        Inputs: 0,
+        Eps: 0.0,
+        Execs: 0,
+        Results: 0,
+        Progress: 0.0,
+    };
+    scope.targets = { };
+    scope.ntargets = 0;
+    scope.duration = 0;
+    scope.firstTimeUpdate = false;
 
-  // Init variables
-  scope.domain = "";
-  scope.stats = {
-      Start: "",
-      Stop: "",
-      Total: 0,
-      Inputs: 0,
-      Eps: 0.0,
-      Execs: 0,
-      Results: 0,
-      Progress: 0.0,
-  };
-  scope.targets = { };
-  scope.ntargets = 0;
-  scope.duration = 0;
-  scope.firstTimeUpdate = false;
-  scope.showEmpty = null;
-  scope.searchText = null;
-  scope.reverse = true;
+    scope.applyFilters = function(data) {
+        if( $('#show_empty').is(':checked') == false ) {
+            var filtered = {};
+            for( var ip in data.targets ) {
+                var t = data.targets[ip];
+                if( t.Info != null && t.Info.ports.length > 0 ) {
+                    filtered[ip] = t;
+                }
+            }
 
-  // Sort by property name
-  scope.sortBy = function(property) {
-    scope.reverse = (scope.order === property) ? !scope.reverse : false;
-    scope.order = property;
-  };
-
-  // Reset filter and sort variables to original value
-  scope.reset = function() {
-    scope.reverse = true;
-    scope.order = null;
-    scope.searchText = null;
-  }
-
-  // Data refresh function
-  scope.update = function() {
-
-      http.get('/targets').then(function(response) {
-
-        var data = response.data;
-
-        if( data.stats.Progress < 100.0 || scope.firstTimeUpdate == false ) {
-            var start = new Date(data.stats.Start),
-                stop = new Date(data.stats.Stop),
-                dur = new Date(null);
-
-            dur.setSeconds( (stop-start) / 1000 );
-            scope.duration = dur.toISOString().substr(11, 8);
+            data.targets = filtered;
         }
 
-        // Update ui variables
-        scope.ntargets = Object.keys(scope.targets).length;
-        scope.targets = data.targets;
-        scope.domain = data.domain;
-        scope.stats = data.stats;
+        var search = $('#search').val();
+        if( search != "" ) {
+            search = search.toLowerCase();
 
-        // Update page title
-        document.title = "XRAY ( " + scope.domain + " | " + scope.stats.Progress.toFixed(2) + "% )";
+            var filtered = {};
+            for( var ip in data.targets ) {
+                var t = data.targets[ip];
+                var txt = JSON.stringify(t).toLowerCase();
+                if( txt.search(search) >= 0 ) {
+                    filtered[ip] = t;
+                }
+            }
 
-        scope.firstTimeUpdate = true;
+            data.targets = filtered;
+        }
+    };
 
-      });
+    scope.update = function() {
+        $.get('/targets', function(data) {
+            if( data.stats.Progress < 100.0 || scope.firstTimeUpdate == false ) {
+                var start = new Date(data.stats.Start),
+                    stop = new Date(data.stats.Stop),
+                    dur = new Date(null);
 
-  }
+                dur.setSeconds( (stop-start) / 1000 );
+                scope.duration = dur.toISOString().substr(11, 8);
+            }
+            
+            scope.ntargets = Object.keys(scope.targets).length;
 
-  // Start refresh interval
-  setInterval( scope.update, 500 );
+            scope.applyFilters(data);
 
+            scope.targets = data.targets;
+            scope.domain = data.domain;
+            scope.stats = data.stats;
+            
+            document.title = "XRAY ( " + scope.domain + " | " + scope.stats.Progress.toFixed(2) + "% )";
+
+            scope.$apply();
+            scope.firstTimeUpdate = true;
+
+            $('.htoggle').each(function() {
+                $(this).click(function(e){
+                    $( $(this).attr('href') ).toggle();
+                    return false;
+                });
+            });
+        });
+    }
+
+    setInterval( scope.update, 500 );
 }]);

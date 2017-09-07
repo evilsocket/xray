@@ -27,49 +27,44 @@
 package xray
 
 import (
-	"encoding/json"
 	"fmt"
+	"io/ioutil"
 	"net/http"
+	"regexp"
+	"strings"
 )
 
-type ViewDNS struct {
-	apikey string
+type CertSH struct {
 }
 
-type Query struct {
-	tool   string
-	domain string
+func NewCertSH() *CertSH {
+	return &CertSH{}
 }
 
-type Response struct {
-	Records []HistoryEntry `json:"records"`
-}
+func (me *CertSH) GetSubDomains(c *Context) []string {
+	url := fmt.Sprintf("https://crt.sh/?q=%%25.%s", c.Domain)
+	unique := make(map[string]bool)
 
-type Result struct {
-	Query    Query    `json:"query"`
-	Response Response `json:"response"`
-}
+	if res, err := http.Get(url); err == nil {
+		defer res.Body.Close()
 
-func NewViewDNS(apikey string) *ViewDNS {
-	return &ViewDNS{apikey: apikey}
-}
-
-func (d *ViewDNS) GetHistory(domain string) []HistoryEntry {
-	url := fmt.Sprintf("https://api.viewdns.info/iphistory/?domain=%s&apikey=%s&output=json", domain, d.apikey)
-	history := make([]HistoryEntry, 0)
-
-	if d.apikey != "" {
-		if res, err := http.Get(url); err == nil {
-			defer res.Body.Close()
-
-			decoder := json.NewDecoder(res.Body)
-			r := Result{}
-
-			if err = decoder.Decode(&r); err == nil {
-				history = r.Response.Records
+		if raw_body, err := ioutil.ReadAll(res.Body); err == nil {
+			data := string(raw_body)
+			re := regexp.MustCompile(fmt.Sprintf(">([^<\\*%%]+)\\.%s<", regexp.QuoteMeta(c.Domain)))
+			if match := re.FindAllString(data, -1); match != nil {
+				for _, m := range match {
+					m = strings.Trim(m, "><")
+					sub := c.GetSubDomain(m)
+					unique[sub] = true
+				}
 			}
 		}
 	}
 
-	return history
+	sub := make([]string, len(unique))
+	for k := range unique {
+		sub = append(sub, k)
+	}
+
+	return sub
 }

@@ -174,6 +174,14 @@ func (m *Machine) Start() error {
 		m.Stats.Start = time.Now()
 	}
 
+	go func() {
+		if ctx := GetContext(); ctx != nil {
+			for _, sub := range ctx.CSH.GetSubDomains(ctx) {
+				m.AddInput(sub)
+			}
+		}
+	}()
+
 	for line := range lines {
 		m.AddInput(line)
 	}
