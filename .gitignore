@@ -1,7 +1,4 @@
 .DS_Store
-*-session.json
-cmd/xray/ui.go
 *.sw*
 vendor/
-build/
-!.gitkeep
+xray

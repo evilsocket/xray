@@ -1,46 +1,21 @@
-NAME=xray
-SOURCE=cmd/$(NAME)/*.go
-GOBUILD=go build
-DEPEND=github.com/Masterminds/glide
-GOFILES=$(shell find . -type f -name '*.go' -not -path "./vendor/*")
+SHELL := bash
 
-.PHONY: format
-format:
-	@gofmt -s -w $(GOFILES)
+all: xray
 
-# Command to get glide, you need to run it only once
-.PHONY: get_glide
-get_glide:
-	go get -u -v $(DEPEND)
-	$(GOPATH)/bin/glide install
+godep:
+	@go get -u github.com/golang/dep/...
 
-# Command to install dependencies using glide
-.PHONY: install_dependencies
-install_dependencies:
-	glide install
+deps: godep
+	@dep ensure
 
-# Run tests in verbose mode with race detector and display coverage
-.PHONY: test
-test:
-	go test -v -cover -race $(shell glide novendor)
+xray: deps
+	@go build -o xray .
 
-# Removing artifacts
-.PHONY: clean
 clean:
-	@rm -rf $(NAME) ui.go
-	@rm -rf build
+	@rm -rf xray
 
-.PHONY: static
-static: format
-	go-bindata -o cmd/xray/ui.go -pkg main ui
+install:
+	@cp xray /usr/local/bin/
 
-# Building linux binaries
-.PHONY: build
-build: static
-	@mkdir -p build		
-	@$(GOBUILD) -o build/$(NAME) $(SOURCE)
-
-# Run the application
-.PHONY: run
-run:
-	go run $(SOURCE)
+docker:
+	@docker build -t xray:latest .
