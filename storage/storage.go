@@ -22,7 +22,7 @@ type Storage struct {
 
 	Path    string
 	Keys    *Keys
-	Domains *Wordlist
+	Domains Wordlist
 }
 
 var (

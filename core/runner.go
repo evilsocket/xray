@@ -6,6 +6,10 @@ import (
 	"sync"
 )
 
+var (
+	Queue = (*Runner)(nil)
+)
+
 type Job func() error
 
 type Runner struct {
@@ -20,12 +24,13 @@ func NewRunner(consumers int) *Runner {
 		consumers = runtime.NumCPU() * 2
 	}
 
-	return &Runner{
+	Queue = &Runner{
 		consumers: consumers,
 		wg:        sync.WaitGroup{},
 		jobs:      make(chan Job),
 		stopped:   make(chan bool),
 	}
+	return Queue
 }
 
 func (r *Runner) worker(id int) {

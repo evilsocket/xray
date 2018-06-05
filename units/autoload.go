@@ -11,4 +11,5 @@ func init() {
 
 	Loaded = make([]Unit, 0)
 	Loaded = append(Loaded, NewDNSEnum())
+	Loaded = append(Loaded, NewPortScan())
 }

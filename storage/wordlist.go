@@ -8,35 +8,32 @@ import (
 	"github.com/evilsocket/xray/core"
 )
 
-type Wordlist struct {
-	Path string
-	out  chan string
-}
+type Wordlist []string
 
-func loadWordlist(fileName string) (w *Wordlist, err error) {
+func loadWordlist(fileName string) (w Wordlist, err error) {
 	var fp *os.File
 
-	w = &Wordlist{
-		Path: fileName,
-	}
+	w = make(Wordlist, 0)
+	tmp := make(map[string]bool)
 
-	if core.Exists(w.Path) {
-		log.Printf("loading wordlist from '%s'", w.Path)
+	if core.Exists(fileName) {
+		log.Printf("loading wordlist from '%s'", fileName)
 
-		if fp, err = os.Open(w.Path); err != nil {
+		if fp, err = os.Open(fileName); err != nil {
 			return
 		}
+		defer fp.Close()
 
-		w.out = make(chan string)
-		go func() {
-			defer fp.Close()
-			defer close(w.out)
-			scanner := bufio.NewScanner(fp)
-			scanner.Split(bufio.ScanLines)
-			for scanner.Scan() {
-				w.out <- scanner.Text()
+		scanner := bufio.NewScanner(fp)
+		scanner.Split(bufio.ScanLines)
+
+		for scanner.Scan() {
+			word := core.Trim(scanner.Text())
+			if found, _ := tmp[word]; !found {
+				tmp[word] = true
+				w = append(w, word)
 			}
-		}()
+		}
 	}
 
 	return

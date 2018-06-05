@@ -2,6 +2,39 @@
 
 
 [[projects]]
+  branch = "master"
+  name = "github.com/bobesa/go-domain-util"
+  packages = ["domainutil"]
+  revision = "52a3e1205163bddb36605bd6963babb73e70f8d6"
+
+[[projects]]
+  branch = "master"
+  name = "golang.org/x/net"
+  packages = ["idna"]
+  revision = "1e491301e022f8f977054da4c2d852decd59571f"
+
+[[projects]]
+  name = "golang.org/x/text"
+  packages = [
+    "collate",
+    "collate/build",
+    "internal/colltab",
+    "internal/gen",
+    "internal/tag",
+    "internal/triegen",
+    "internal/ucd",
+    "language",
+    "secure/bidirule",
+    "transform",
+    "unicode/bidi",
+    "unicode/cldr",
+    "unicode/norm",
+    "unicode/rangetable"
+  ]
+  revision = "f21a4dfb5e38f5895301dc265a8def02365cc3d0"
+  version = "v0.3.0"
+
+[[projects]]
   name = "gopkg.in/yaml.v2"
   packages = ["."]
   revision = "5420a8b6744d3b0345ab293f6fcba19c978f1183"
@@ -10,6 +43,6 @@
 [solve-meta]
   analyzer-name = "dep"
   analyzer-version = 1
-  inputs-digest = "9aeea773a778bfcaf7a592cba29482cc41403ac6642e31709d7a2ad5b9562347"
+  inputs-digest = "3882fa3b3ac3e1f6f8bcaef352b34448aa79099c1029b24a8e2cdb9ae0125366"
   solver-name = "gps-cdcl"
   solver-version = 1

@@ -1,9 +1,9 @@
 package units
 
-type Unit interface {
-	AcceptsInputType(t InputType) bool
-	EmitsOutputType() OutputType
-	Propagates() bool
+type DataChannel <-chan Data
 
-	Run(input string)
+type Unit interface {
+	AcceptsInput(in Data) bool
+	Propagates() bool
+	Run(in Data) <-chan Data
 }

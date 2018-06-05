@@ -1,6 +1,8 @@
 package units
 
-import "sync"
+import (
+	"sync"
+)
 
 type State struct {
 	sync.RWMutex
@@ -13,15 +15,15 @@ func NewState() *State {
 	}
 }
 
-func (s *State) AddProcessed(input string) {
+func (s *State) Add(data string) {
 	s.Lock()
 	defer s.Unlock()
-	s.processed[input] = true
+	s.processed[data] = true
 }
 
-func (s *State) DidProcessInput(input string) (found bool) {
+func (s *State) DidProcess(data string) (found bool) {
 	s.RLock()
 	defer s.RUnlock()
-	_, found = s.processed[input]
+	_, found = s.processed[data]
 	return
 }

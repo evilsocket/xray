@@ -7,6 +7,7 @@ import (
 	"os"
 	"os/signal"
 	"syscall"
+	// "time"
 
 	"github.com/evilsocket/xray/core"
 	"github.com/evilsocket/xray/storage"
@@ -20,6 +21,7 @@ var (
 	logFile     = flag.String("log-file", "", "If filled, xray will log to this file.")
 
 	err     = (error)(nil)
+	state   = units.NewState()
 	runner  = (*core.Runner)(nil)
 	strg    = (*storage.Storage)(nil)
 	sigChan = (chan os.Signal)(nil)
@@ -37,6 +39,23 @@ func setupSignals() {
 		log.Printf("got signal %v", sig)
 		os.Exit(0)
 	}()
+}
+
+func propagate(input units.Data) []<-chan units.Data {
+	chans := make([]<-chan units.Data, 0)
+
+	if !state.DidProcess(input.Data) {
+		state.Add(input.Data)
+		log.Printf("propagating %s", input)
+
+		for _, u := range units.Loaded {
+			if u.AcceptsInput(input) {
+				chans = append(chans, u.Run(input))
+			}
+		}
+	}
+
+	return chans
 }
 
 func main() {
@@ -61,25 +80,33 @@ func main() {
 	runner.Start()
 	defer runner.Stop()
 
-	/*
-		for i := 0; i < 100; i++ {
-			func(n int) {
-				runner.Run(func() error {
-					fmt.Printf("running #%d\n", n)
-					return nil
-				})
-			}(i)
-		}
-	*/
-
-	in := "google.com"
-	intype := units.InputTypeDomain
-
-	for _, u := range units.Loaded {
-		if u.AcceptsInputType(intype) {
-			u.Run(in)
-		}
+	in := units.Data{
+		Type: units.DataTypeDomain,
+		Data: "something-something.ansa.it",
 	}
 
-	runner.Wait()
+	queue := []units.Data{in}
+
+	for {
+		// log.Printf("%v", queue)
+		for _, input := range queue {
+			chans := propagate(input)
+
+			for _, ch := range chans {
+				func(c <-chan units.Data) {
+					go func() {
+						for out := range c {
+							log.Printf("  > %s", out)
+							for _, o := range out.Explode() {
+								queue = append(queue, o)
+							}
+						}
+					}()
+				}(ch)
+			}
+		}
+
+		// time.Sleep(100 * time.Millisecond)
+		runner.Wait()
+	}
 }
