@@ -6,44 +6,41 @@ import (
 	"sync"
 )
 
-var (
-	Queue = (*Runner)(nil)
-)
-
 type Job func() error
 
 type Runner struct {
+	name      string
 	consumers int
 	wg        sync.WaitGroup
 	stopped   chan bool
 	jobs      chan Job
 }
 
-func NewRunner(consumers int) *Runner {
+func NewRunner(consumers int, name string) *Runner {
 	if consumers <= 0 {
 		consumers = runtime.NumCPU() * 2
 	}
 
-	Queue = &Runner{
+	return &Runner{
 		consumers: consumers,
+		name:      name,
 		wg:        sync.WaitGroup{},
 		jobs:      make(chan Job),
 		stopped:   make(chan bool),
 	}
-	return Queue
 }
 
 func (r *Runner) worker(id int) {
 	// log.Printf("started consumer %d", id)
 	for job := range r.jobs {
 		if job == nil {
-			log.Printf("stopping consumer %d", id)
+			log.Printf("%s: stopping consumer %d", r.name, id)
 			r.stopped <- true
 			return
 		}
 
 		if err := job(); err != nil {
-			log.Printf("error while executing Job: %v", err)
+			log.Printf("%s: error while executing Job: %v", r.name, err)
 		}
 
 		r.wg.Done()
@@ -51,8 +48,7 @@ func (r *Runner) worker(id int) {
 }
 
 func (r *Runner) Start() {
-	log.Printf("starting runner with %d consumers", r.consumers)
-
+	log.Printf("%s: starting runner with %d consumers", r.name, r.consumers)
 	for i := 0; i < r.consumers; i++ {
 		go r.worker(i)
 	}

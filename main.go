@@ -76,37 +76,39 @@ func main() {
 		log.Fatalf("error opening storage: %v", err)
 	}
 
-	runner = core.NewRunner(*consumers)
+	runner = core.NewRunner(*consumers, "main:runner")
 	runner.Start()
 	defer runner.Stop()
 
 	in := units.Data{
 		Type: units.DataTypeDomain,
-		Data: "something-something.ansa.it",
+		Data: "something-something.github.com",
 	}
 
 	queue := []units.Data{in}
 
 	for {
-		// log.Printf("%v", queue)
+		log.Printf("%v", queue)
 		for _, input := range queue {
 			chans := propagate(input)
 
 			for _, ch := range chans {
 				func(c <-chan units.Data) {
-					go func() {
+					runner.Run(func() error {
 						for out := range c {
 							log.Printf("  > %s", out)
 							for _, o := range out.Explode() {
 								queue = append(queue, o)
 							}
 						}
-					}()
+
+						return nil
+					})
 				}(ch)
 			}
 		}
 
 		// time.Sleep(100 * time.Millisecond)
-		runner.Wait()
+		// runner.Wait()
 	}
 }
