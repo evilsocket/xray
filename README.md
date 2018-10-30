@@ -60,13 +60,7 @@ Then:
 
     go get github.com/evilsocket/xray
     cd $GOPATH/src/github.com/evilsocket/xray/
-    make get_glide
-    make install_dependencies
-    make build
-
-If you see errors regarding a missing `go-bindata` binary, try the following and then `make build` again:
-
-    go get -u github.com/jteeuwen/go-bindata/...
+    make
 
 You'll find the executable in the `build` folder.
 

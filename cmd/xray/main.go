@@ -133,7 +133,7 @@ func main() {
 	router = gin.New()
 
 	// Test Shodan API
-	info, err := c.Shodan.GetAPIInfo()
+	info, err := c.Shodan.GetAPIInfo(nil)
 	if *shodan_tok != "" && err != nil {
 		fmt.Println("Shodan Error:", err)
 		fmt.Println("Please fix error or remove `-shodan-key` flag")

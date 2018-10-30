@@ -113,7 +113,7 @@ func (t *Target) startAsyncScan() {
 			t.Hostnames = names
 		}
 
-		info, err := t.ctx.Shodan.GetServicesForHost(t.Address, &shodan.HostServicesOptions{
+		info, err := t.ctx.Shodan.GetServicesForHost(nil, t.Address, &shodan.HostServicesOptions{
 			History: false,
 			Minify:  true,
 		})
