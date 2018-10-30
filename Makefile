@@ -18,6 +18,7 @@ get_glide:
 .PHONY: install_dependencies
 install_dependencies:
 	glide install
+	go get -u github.com/jteeuwen/go-bindata/...
 
 # Run tests in verbose mode with race detector and display coverage
 .PHONY: test
