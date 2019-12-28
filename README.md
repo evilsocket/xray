@@ -29,10 +29,15 @@ XRay is a very simple tool, it works this way:
 
 The [shodan.io](https://www.shodan.io/) API key parameter ( `-shodan-key KEY` ) is optional, however if not specified, no service fingerprinting will be performed and a lot less information will be shown (basically it just gonna be DNS subdomain enumeration).
 
+To set a default value for the Shodan API Key, Change the ```/cmd/xray/main.go``` file 
+``` shodan_tok  = flag.String("shodan-key", "Enter Default Key Here", "Shodan API key.")``` accordingly
+
 **ViewDNS API Key**
 
 If a [ViewDNS](http://viewdns.info/) API key parameter ( `-viewdns-key KEY` ) is passed, domain historical data will also be retrieved.
 
+To set a default value for the ViewDNS API Key, Change the ```/cmd/xray/main.go``` file 
+```	viewdns_tok = flag.String("viewdns-key", "Enter Default Key Here", "ViewDNS API key.")``` accordingly
 
 **Anonymity and Legal Issues**
 
