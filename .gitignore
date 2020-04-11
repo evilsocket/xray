@@ -5,3 +5,4 @@ cmd/xray/ui.go
 vendor/
 build/
 !.gitkeep
+/.idea/
