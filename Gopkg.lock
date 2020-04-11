@@ -19,6 +19,17 @@
 
 [[projects]]
   branch = "master"
+  digest = "1:15546b9073d1ebd13d754dc1248ae94b4bba1b4206f2aa2516b20f92730dad84"
+  name = "github.com/evilsocket/xray"
+  packages = [
+    ".",
+    "grabbers",
+  ]
+  pruneopts = "UT"
+  revision = "73f8221df1ad4b88e37f3f86d20dbe2604b70860"
+
+[[projects]]
+  branch = "master"
   digest = "1:36fe9527deed01d2a317617e59304eb2c4ce9f8a24115bcc5c2e37b3aee5bae4"
   name = "github.com/gin-contrib/sse"
   packages = ["."]
@@ -187,6 +198,8 @@
   input-imports = [
     "github.com/bobesa/go-domain-util/domainutil",
     "github.com/elazarl/go-bindata-assetfs",
+    "github.com/evilsocket/xray",
+    "github.com/evilsocket/xray/grabbers",
     "github.com/gin-gonic/contrib/static",
     "github.com/gin-gonic/gin",
     "github.com/miekg/dns",
