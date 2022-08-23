@@ -73,6 +73,7 @@
             <th>Domains</th>
             <th width="10%">Ports</th>
             <th width="45%">Info</th>
+            <th>CVE</th>
             <th>ISP</th>
             <th>Country</th>
           </tr>
@@ -126,7 +127,15 @@
               </table>
           
             </td>
-            
+
+            <td>
+              <table class="table borderless">
+                <tr ng-repeat="cveName in t.Info.vulns">
+                  <td><a href="https://nvd.nist.gov/vuln/detail/{{cveName}}" target="_blank"> {{cveName}} </a></td>
+                </tr>
+              </table>
+            </td>
+
             <td>{{ t.Info.isp }}</td>
             
             <td>{{ t.Info.country_name }}</td>
