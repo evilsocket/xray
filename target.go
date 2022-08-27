@@ -16,6 +16,8 @@ type HistoryEntry struct {
 }
 
 type Target struct {
+	sync.Mutex
+
 	Address   string
 	Hostnames []string
 	Domains   []string
@@ -24,9 +26,6 @@ type Target struct {
 	History   map[string][]HistoryEntry
 
 	ctx *Context `json:"-"`
-	//empijei: I suggest composing Context with a mutex and removing this
-	//instance variable see "Embedding" in "Effective Go"
-	lock sync.Mutex `json:"-"`
 }
 
 func NewTarget(address string, domain string) *Target {
@@ -45,9 +44,9 @@ func NewTarget(address string, domain string) *Target {
 	return t
 }
 
-func (t Target) AddDomain(domain string) bool {
-	t.lock.Lock()
-	defer t.lock.Unlock()
+func (t *Target) AddDomain(domain string) bool {
+	t.Lock()
+	defer t.Unlock()
 
 	for _, d := range t.Domains {
 		if d == domain {
@@ -73,12 +72,12 @@ func (t *Target) SortedBanners() []string {
 	return banners
 }
 
-func (t Target) scanDomainAsync(domain string) {
+func (t *Target) scanDomainAsync(domain string) {
 	go func(t *Target, domain string) {
-		t.lock.Lock()
-		defer t.lock.Unlock()
+		t.Lock()
+		defer t.Unlock()
 		t.History[domain] = t.ctx.VDNS.GetHistory(domain)
-	}(&t, domain)
+	}(t, domain)
 }
 
 func (t *Target) startAsyncScan() {
