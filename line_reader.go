@@ -2,6 +2,7 @@ package xray
 
 import (
 	"bufio"
+	"fmt"
 	"os"
 )
 
@@ -16,16 +17,16 @@ func LineReader(filename string) (chan string, error) {
 
 	out := make(chan string)
 	go func() {
-		/*empijei: error not handled,
-		suggestion to either handle it or throw it away properly, i.e.:
-		defer func(){
-			_ = fp.Close()
-		}
-		*/
-		defer fp.Close()
+		defer func() {
+			if err = fp.Close(); err != nil {
+				fmt.Printf("error closing %s: %v\n", filename, err)
+			}
+		}()
+
 		// we need to close the out channel in order
 		// to signal the end-of-data condition
 		defer close(out)
+
 		scanner := bufio.NewScanner(fp)
 		scanner.Split(bufio.ScanLines)
 		for scanner.Scan() {
