@@ -1,20 +1,18 @@
-FROM golang:alpine
+FROM golang:alpine as build-stage
 
-# Add git and make to alpine
-RUN apk add --no-cache git make
+RUN apk --no-cache add ca-certificates
 
-# Download and install xray as per instructions
-RUN go get github.com/evilsocket/xray && \
-    cd $GOPATH/src/github.com/evilsocket/xray/ && \
-    make
+WORKDIR /go/src/github.com/evilsocket/xray
 
-# Default port for xray
+COPY . .
+
+RUN CGO_ENABLED=0 GOOS=linux go build -a -o /xray ./cmd/xray/*.go
+
+FROM scratch
+
+COPY --from=build-stage /etc/ssl/certs/ca-certificates.crt /etc/ssl/certs/ca-certificates.crt
+COPY --from=build-stage /xray /xray
+
 EXPOSE 8080
 
-# Settings for run
-ENV PATH /go/src/github.com/evilsocket/xray/build/:$PATH
-
-# Build directory
-WORKDIR /go/src/github.com/evilsocket/xray/
-
-CMD ["xray"]
+ENTRYPOINT ["/xray"]
