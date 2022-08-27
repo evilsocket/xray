@@ -54,7 +54,7 @@ func (b *BFS) Exists(prefix string, filepath string) bool {
 }
 
 func NewBFS(root string) *BFS {
-	fs := &assetfs.AssetFS{Asset, AssetDir, AssetInfo, root}
+	fs := &assetfs.AssetFS{Asset, AssetDir, AssetInfo, root, ""}
 	return &BFS{
 		fs,
 	}

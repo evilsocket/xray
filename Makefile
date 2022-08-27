@@ -1,32 +1,16 @@
 NAME=xray
 SOURCE=cmd/$(NAME)/*.go
-GOBUILD=go build
-DEPEND=github.com/Masterminds/glide
-GOFILES=$(shell find . -type f -name '*.go' -not -path "./vendor/*")
 
-all: deps static
+all: static
 	@mkdir -p build		
-	@$(GOBUILD) -o build/$(NAME) $(SOURCE)
-
-format:
-	@gofmt -s -w $(GOFILES)
-
-deps: godep
-	dep ensure
-	go get -u github.com/jteeuwen/go-bindata/...
+	go build -o build/$(NAME) $(SOURCE)
 
 test:
-	go test -v -cover -race $(shell glide novendor)
-
-godep:
-	@go get -u github.com/golang/dep/...
+	go test -v -cover -race
 
 clean:
-	@rm -rf $(NAME) ui.go
+	@rm -rf cmd/xray/ui.go
 	@rm -rf build
 
-static: format
+static:
 	go-bindata -o cmd/xray/ui.go -pkg main ui
-
-run:
-	go run $(SOURCE)
