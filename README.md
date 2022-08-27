@@ -2,8 +2,6 @@
 
 XRay is a tool for network OSINT gathering, its goal is to make some of the initial tasks of information gathering and network mapping automatic.
 
-![xray](https://pbs.twimg.com/media/DETbmJBXgAABYMp.jpg:large)
-
 ## How Does it Work?
 
 XRay is a very simple tool, it works this way:
