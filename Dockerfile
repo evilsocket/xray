@@ -13,6 +13,8 @@ FROM scratch
 COPY --from=build-stage /etc/ssl/certs/ca-certificates.crt /etc/ssl/certs/ca-certificates.crt
 COPY --from=build-stage /xray /xray
 
+ADD wordlists/ wordlists/
+
 EXPOSE 8080
 
 ENTRYPOINT ["/xray"]

@@ -48,7 +48,7 @@ To build a Docker image with the latest version of XRay:
 
 Once built, XRay can be started within a Docker container using the following:
 
-    docker run --rm -it -p 8080:8080 xraydocker xray -address 0.0.0.0 -shodan-key shodan_key_here -domain example.com 
+    docker run --rm -it -p 8080:8080 xraydocker -address 0.0.0.0 -shodan-key shodan_key_here -domain example.com 
 
 ## Manual Compilation
 
